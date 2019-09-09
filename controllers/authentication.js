@@ -45,5 +45,5 @@ exports.signin = function (req, res, next) {
 }
 
 exports.signInGoogle = function (req, res, next) {
-    res.redirect("/?token=" + tokenForUser(req.user));
+    res.redirect(req.headers.referer + "google/" + tokenForUser(req.user));
 }
