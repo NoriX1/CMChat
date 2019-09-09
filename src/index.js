@@ -11,6 +11,7 @@ import reducers from 'reducers';
 import Header from 'components/Header/Header';
 import Landing from 'components/Landing/Landing';
 import GoogleAuth from 'components/GoogleAuth/GoogleAuth';
+import Registration from 'components/Registration/Registration';
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 const store = createStore(reducers, {
@@ -24,6 +25,7 @@ ReactDOM.render(
                 <Route path="/" component={Header} />
                 <Route exact path="/" component={Landing} />
                 <Route path="/google/:token" component={GoogleAuth} />
+                <Route path="/register" component={Registration} />
             </App>
         </BrowserRouter>
     </Provider>,

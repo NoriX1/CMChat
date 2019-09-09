@@ -20,3 +20,19 @@ export const signInGoogle = (token, callback) => dispatch => {
     localStorage.setItem("token", token);
     callback();
 }
+
+export const signUp = (formValues, callback) => async dispatch => {
+    try {
+        const response = await backend.post('/signup', formValues);
+        dispatch({ type: AUTH_USER, payload: response.data });
+        localStorage.setItem("token", response.data);
+        callback();
+    } catch (e) {
+        dispatch({ type: AUTH_ERROR, payload: e.response.data.error })
+    }
+}
+
+export const signOut = () => dispatch => {
+    dispatch({ type: AUTH_USER, payload: '' });
+    localStorage.removeItem("token");
+}
