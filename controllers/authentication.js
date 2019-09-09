@@ -9,10 +9,11 @@ function tokenForUser(user) {
 }
 
 exports.signup = function (req, res, next) {
+    const name = req.body.name;
     const email = req.body.email;
     const password = req.body.password;
 
-    if (!email || !password) {
+    if (!name || !email || !password) {
         return res.status(422).send({ error: 'You must provide all required fields!' });
     }
 
@@ -24,6 +25,7 @@ exports.signup = function (req, res, next) {
         }
 
         const user = new User({
+            name: name,
             email: email,
             password: password
         });

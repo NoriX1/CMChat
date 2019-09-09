@@ -48,6 +48,7 @@ const googleAuth = new GoogleStrategy(googleOptions, function (accessToken, refr
             done(null, existingUser);
         } else {
             const user = new User({
+                name: profile.displayName,
                 googleID: profile.id,
                 email: profile.emails[0].value
             });
