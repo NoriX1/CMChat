@@ -1,4 +1,4 @@
-import { AUTH_USER, AUTH_ERROR } from 'actions/types';
+import { AUTH_USER, AUTH_ERROR, FETCH_ROOMS } from 'actions/types';
 import backend from 'apis/backend';
 
 export const signIn = (formValues, callback) => async dispatch => {
@@ -35,4 +35,17 @@ export const signUp = (formValues, callback) => async dispatch => {
 export const signOut = () => dispatch => {
     dispatch({ type: AUTH_USER, payload: '' });
     localStorage.removeItem("token");
+}
+
+export const fetchRooms = () => async dispatch => {
+    try {
+        const response = await backend.get('/rooms', {
+            headers: {
+                authorization: localStorage.getItem('token')
+            }
+        });
+        dispatch({ type: FETCH_ROOMS, payload: response.data });
+    } catch (e) {
+        console.warn(e.response.data);
+    }
 }

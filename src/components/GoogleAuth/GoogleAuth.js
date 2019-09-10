@@ -7,7 +7,7 @@ const GoogleAuth = (props) => {
     useEffect(() => {
         if (props.match.params.token) {
             props.signInGoogle(props.match.params.token, () => {
-                props.history.push('/');
+                props.history.push('/rooms');
             });
         }
     });

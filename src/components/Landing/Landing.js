@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 
@@ -9,9 +9,15 @@ import fields from 'components/Form/formFields';
 
 const Landing = (props) => {
 
+    useEffect(() => {
+        if (props.auth) {
+            props.history.push('rooms');
+        }
+    });
+
     function handleSignInSubmit(formValues) {
         props.signIn(formValues, () => {
-            props.history.push('/');
+            props.history.push('/rooms');
         });
 
     }
@@ -57,7 +63,7 @@ const Landing = (props) => {
 }
 
 function mapStateToProps(state) {
-    return { authError: state.auth.errorMessage };
+    return { authError: state.auth.errorMessage, auth: state.auth.authenticated };
 }
 
 export default connect(mapStateToProps, actions)(Landing);
