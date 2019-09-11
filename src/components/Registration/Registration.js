@@ -11,6 +11,7 @@ const Registration = (props) => {
 
     function handleSignInSubmit(formValues) {
         props.signUp(formValues, () => {
+            props.fetchUser(localStorage.getItem('token'));
             props.history.push('/');
         });
     }

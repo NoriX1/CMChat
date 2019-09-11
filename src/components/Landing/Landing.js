@@ -17,6 +17,7 @@ const Landing = (props) => {
 
     function handleSignInSubmit(formValues) {
         props.signIn(formValues, () => {
+            props.fetchUser(localStorage.getItem('token'));
             props.history.push('/rooms');
         });
 

@@ -13,13 +13,17 @@ const Header = (props) => {
     return (
         <div className="header">
             <div className="container">
-                <div className="row">
-                    <div className="col-10 text-center">
+                <div className="row mt-3 mb-3">
+                    <div className="col-6 text-left">
                         {props.auth ?
-                            <Link to="/rooms" className="col-10 text-center"><h4>CMChat</h4></Link> :
-                            <Link to="/" className="col-10 text-center"><h4>CMChat</h4></Link>}
+                            <Link to="/rooms"><h4>CMChat</h4></Link> :
+                            <Link to="/"><h4>CMChat</h4></Link>}
                     </div>
-                    {props.auth && <div className="col-2"><button className="btn btn-danger" onClick={onSignOutClick}>Sign Out</button></div>}
+                    {props.auth &&
+                        <div className="col-6 text-right">
+                            <div className="btn btn-outline-info">Welcome{props.currentUser ? `, ${props.currentUser.name}` : ` !`}</div>
+                            <button className="btn btn-danger" onClick={onSignOutClick}>Sign Out</button>
+                        </div>}
                 </div>
             </div>
         </div>
@@ -27,7 +31,7 @@ const Header = (props) => {
 }
 
 function mapStateToProps(state) {
-    return { auth: state.auth.authenticated }
+    return { auth: state.auth.authenticated, currentUser: state.auth.currentUser }
 }
 
 export default connect(mapStateToProps, actions)(Header);
