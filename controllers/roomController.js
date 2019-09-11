@@ -1,4 +1,5 @@
 const Room = require('../models/room');
+const User = require('../models/user');
 
 exports.createNewRoom = function (req, res, next) {
     if (!req.body.name) {
@@ -16,9 +17,9 @@ exports.createNewRoom = function (req, res, next) {
             _owner: req.user
         });
 
-        room.save((err) => {
+        room.save((err, createdRoom) => {
             if (err) { return next(err); }
-            res.send(room);
+            res.send(createdRoom);
         });
     });
 }
@@ -26,7 +27,17 @@ exports.createNewRoom = function (req, res, next) {
 exports.getAllRooms = function (req, res, next) {
     Room.find((err, rooms) => {
         if (err) { return next(err); }
-        res.send(rooms);
+        const promises = rooms.map((room) => {
+            return User.findOne({ _id: room._owner }, { name: 1 }).then((findedUser) => {
+                if (findedUser) {
+                    room._owner = findedUser;
+                }
+                return room;
+            });
+        });
+        Promise.all(promises).then((roomsWithUser) => {
+            res.send(roomsWithUser);
+        });
     });
 }
 
