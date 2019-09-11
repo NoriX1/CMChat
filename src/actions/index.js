@@ -3,7 +3,8 @@ import {
     CHANGE_USER,
     AUTH_ERROR,
     FETCH_ROOMS,
-    CREATE_ROOM
+    CREATE_ROOM,
+    DELETE_ROOM
 } from 'actions/types';
 import backend from 'apis/backend';
 
@@ -72,10 +73,19 @@ export const createRoom = (formValues, callback) => async dispatch => {
 }
 
 export const fetchUser = (token) => async dispatch => {
-    console.log('fetching user with token', token);
     try {
         const user = await backend.get('/auth/user', { headers: { authorization: token } });
         dispatch({ type: CHANGE_USER, payload: user.data });
+    } catch (e) {
+        console.warn(e.response.data);
+    }
+}
+
+export const deleteRoom = (id, callback) => async dispatch => {
+    try {
+        const response = await backend.delete(`/rooms/${id}`, { headers: { authorization: localStorage.getItem('token') } });
+        dispatch({ type: DELETE_ROOM, payload: response.data });
+        callback();
     } catch (e) {
         console.warn(e.response.data);
     }

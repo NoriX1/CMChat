@@ -19,12 +19,24 @@ const RoomList = (props) => {
                     <li key={room._id}>
                         <Link to={`/rooms/${room._id}`} className="list-group-item list-group-item-action d-flex justify-content-between">
                             <div>{room.name}</div>
-                            <div>{`Owner: ${room._owner.name}`}</div>
+                            <object><div>{renderOwnerOrDelete(room)}</div></object>
                         </Link>
                     </li>
                 );
-            })
+            });
         }
+    }
+
+    function renderOwnerOrDelete(room) {
+        if (props.currentUser._id === room._owner._id) {
+            return (
+                <div>
+                    <div className="btn btn-secondary">{`Owner: ${room._owner.name}`}</div>
+                    <Link className="btn btn-danger" to={`/rooms/close/${room._id}`}>Close</Link>
+                </div>
+            )
+        }
+        return <div className="btn btn-secondary">{`Owner: ${room._owner.name}`}</div>
     }
 
     return (
@@ -36,7 +48,7 @@ const RoomList = (props) => {
 }
 
 function mapStateToProps(state) {
-    return { rooms: Object.values(state.rooms) }
+    return { rooms: Object.values(state.rooms), currentUser: state.auth.currentUser }
 }
 
 export default connect(mapStateToProps, actions)(requireAuth(RoomList));

@@ -14,6 +14,7 @@ import GoogleAuth from 'components/GoogleAuth/GoogleAuth';
 import Registration from 'components/Registration/Registration';
 import RoomList from 'components/Rooms/RoomList';
 import CreateRoom from 'components/Rooms/CreateRoom';
+import CloseRoom from 'components/Rooms/CloseRoom';
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 const store = createStore(reducers, {
@@ -30,6 +31,7 @@ ReactDOM.render(
                 <Route path="/register" component={Registration} />
                 <Route exact path="/rooms" component={RoomList} />
                 <Route path="/rooms/new" component={CreateRoom} />
+                <Route path="/rooms/close/:id" component={CloseRoom} />
             </App>
         </BrowserRouter>
     </Provider>,
