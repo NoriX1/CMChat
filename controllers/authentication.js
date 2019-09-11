@@ -47,3 +47,12 @@ exports.signin = function (req, res, next) {
 exports.signInGoogle = function (req, res, next) {
     res.redirect(req.headers.referer + "google/" + tokenForUser(req.user));
 }
+
+exports.sendUser = function (req, res, next) {
+    const user = new User({
+        _id: req.user.id,
+        name: req.user.name,
+        email: req.user.email
+    });
+    res.send(user);
+}

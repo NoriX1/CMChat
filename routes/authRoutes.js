@@ -13,4 +13,5 @@ module.exports = function (app) {
     app.post('/signup', Authentication.signup);
     app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
     app.get('/auth/google/callback', passport.authenticate('google', { session: false }), Authentication.signInGoogle);
+    app.get('/auth/user', auth.requireAuth, Authentication.sendUser);
 }
