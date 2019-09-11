@@ -1,4 +1,4 @@
-import { AUTH_USER, AUTH_ERROR, FETCH_ROOMS } from 'actions/types';
+import { AUTH_USER, AUTH_ERROR, FETCH_ROOMS, CREATE_ROOM } from 'actions/types';
 import backend from 'apis/backend';
 
 export const signIn = (formValues, callback) => async dispatch => {
@@ -45,6 +45,20 @@ export const fetchRooms = () => async dispatch => {
             }
         });
         dispatch({ type: FETCH_ROOMS, payload: response.data });
+    } catch (e) {
+        console.warn(e.response.data);
+    }
+}
+
+export const createRoom = (formValues, callback) => async dispatch => {
+    try {
+        const response = await backend.post('/rooms/new', formValues, {
+            headers: {
+                authorization: localStorage.getItem('token')
+            }
+        });
+        dispatch({ type: CREATE_ROOM, payload: response.data });
+        callback();
     } catch (e) {
         console.warn(e.response.data);
     }
