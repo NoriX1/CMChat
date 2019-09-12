@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 
-import * as actions from 'actions';
+import * as actionTypes from 'actions/types';
 import Form from 'components/Form/Form';
 import fields from 'components/Form/formFields';
 
@@ -16,11 +16,7 @@ const Landing = (props) => {
     });
 
     function handleSignInSubmit(formValues) {
-        props.signIn(formValues, () => {
-            props.fetchUser(localStorage.getItem('token'));
-            props.history.push('/rooms');
-        });
-
+        props.dispatch({ type: actionTypes.SIGN_IN_REQUEST, payload: formValues })
     }
 
     function renderSignInButtons() {
@@ -67,4 +63,4 @@ function mapStateToProps(state) {
     return { authError: state.auth.errorMessage, auth: state.auth.authenticated };
 }
 
-export default connect(mapStateToProps, actions)(Landing);
+export default connect(mapStateToProps)(Landing);

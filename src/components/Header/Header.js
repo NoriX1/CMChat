@@ -1,13 +1,12 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import * as actions from 'actions';
+import * as actionTypes from 'actions/types';
 
 const Header = (props) => {
 
     function onSignOutClick() {
-        props.signOut();
-        props.history.push('/');
+        props.dispatch({ type: actionTypes.SIGN_OUT_REQUEST, payload: {} });
     }
 
     return (
@@ -34,4 +33,4 @@ function mapStateToProps(state) {
     return { auth: state.auth.authenticated, currentUser: state.auth.currentUser }
 }
 
-export default connect(mapStateToProps, actions)(Header);
+export default connect(mapStateToProps)(Header);

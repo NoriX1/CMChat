@@ -2,14 +2,14 @@ import React, { useEffect } from 'react';
 import requireAuth from 'components/requireAuth';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import * as actions from 'actions';
+import * as actionTypes from 'actions/types';
 
 const useMountEffect = (fun) => useEffect(fun, [])
 
 const RoomList = (props) => {
 
     useMountEffect(() => {
-        props.fetchRooms();
+        props.dispatch({ type: actionTypes.FETCH_ROOMS_REQUEST, payload: {} })
     });
 
     function renderRoomsList() {
@@ -51,4 +51,4 @@ function mapStateToProps(state) {
     return { rooms: Object.values(state.rooms), currentUser: state.auth.currentUser }
 }
 
-export default connect(mapStateToProps, actions)(requireAuth(RoomList));
+export default connect(mapStateToProps)(requireAuth(RoomList));

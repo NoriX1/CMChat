@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import * as actions from 'actions';
+import * as actionTypes from 'actions/types';
 
 import Modal from 'components/Modal/Modal'
 
@@ -12,9 +12,7 @@ const CloseRoom = (props) => {
             <React.Fragment>
                 <Link to="/rooms" className="btn btn-secondary">Cancel</Link>
                 <button className="btn btn-primary" onClick={() => {
-                    props.deleteRoom(props.match.params.id, () => {
-                        props.history.push('/rooms');
-                    });
+                    props.dispatch({ type: actionTypes.DELETE_ROOM_REQUEST, payload: props.match.params.id });
                 }}>Confirm</button>
             </React.Fragment>
         );
@@ -30,4 +28,4 @@ const CloseRoom = (props) => {
     )
 }
 
-export default connect(null, actions)(CloseRoom);
+export default connect()(CloseRoom);

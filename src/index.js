@@ -1,13 +1,15 @@
 import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { BrowserRouter, Route } from 'react-router-dom';
+import { Router, Route } from 'react-router-dom';
 import { createStore, compose, applyMiddleware } from 'redux';
 import { Provider } from 'react-redux';
-import reduxThunk from 'redux-thunk';
+import createSagaMiddleware from 'redux-saga';
 
 import App from 'components/App';
+import history from './history';
 import reducers from 'reducers';
+import mySaga from 'sagas/sagas';
 import Header from 'components/Header/Header';
 import Landing from 'components/Landing/Landing';
 import GoogleAuth from 'components/GoogleAuth/GoogleAuth';
@@ -17,13 +19,16 @@ import CreateRoom from 'components/Rooms/CreateRoom';
 import CloseRoom from 'components/Rooms/CloseRoom';
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+const sagaMiddleware = createSagaMiddleware();
 const store = createStore(reducers, {
     auth: { authenticated: localStorage.getItem("token") }
-}, composeEnhancers(applyMiddleware(reduxThunk)));
+}, composeEnhancers(applyMiddleware(sagaMiddleware)));
+
+sagaMiddleware.run(mySaga);
 
 ReactDOM.render(
     <Provider store={store}>
-        <BrowserRouter>
+        <Router history={history}>
             <App>
                 <Route path="/" component={Header} />
                 <Route exact path="/" component={Landing} />
@@ -33,6 +38,6 @@ ReactDOM.render(
                 <Route path="/rooms/new" component={CreateRoom} />
                 <Route path="/rooms/close/:id" component={CloseRoom} />
             </App>
-        </BrowserRouter>
+        </Router>
     </Provider>,
     document.querySelector('#root'));

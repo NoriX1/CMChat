@@ -2,15 +2,13 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 
-import * as actions from 'actions';
+import * as actionTypes from 'actions/types';
 import Form from 'components/Form/Form';
 import fields from 'components/Form/formFields';
 
 const CreateRoom = (props) => {
     function handleSubmit(formValues) {
-        props.createRoom(formValues, () => {
-            props.history.push('/rooms');
-        });
+        props.dispatch({ type: actionTypes.CREATE_ROOM_REQUEST, payload: formValues });
     }
 
     function renderButtons() {
@@ -40,4 +38,4 @@ const CreateRoom = (props) => {
     );
 }
 
-export default connect(null, actions)(CreateRoom);
+export default connect()(CreateRoom);

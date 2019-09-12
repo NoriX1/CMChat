@@ -1,14 +1,12 @@
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
-import * as actions from 'actions';
+import * as actionTypes from 'actions/types';
 
 const GoogleAuth = (props) => {
 
     useEffect(() => {
         if (props.match.params.token) {
-            props.signInGoogle(props.match.params.token, () => {
-                props.history.push('/rooms');
-            });
+            props.dispatch({ type: actionTypes.SIGN_IN_GOOGLE_REQUEST, payload: props.match.params.token });
         }
     });
 
@@ -17,4 +15,4 @@ const GoogleAuth = (props) => {
     )
 }
 
-export default connect(null, actions)(GoogleAuth);
+export default connect()(GoogleAuth);

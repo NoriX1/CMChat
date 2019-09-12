@@ -28,10 +28,10 @@ const Form = (props) => {
 }
 
 function validate(values) {
-    console.log(values);
+    
 }
 
 export default reduxForm({
-    form: 'signForm',
+    form: 'form',
     validate
 })(Form);

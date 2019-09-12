@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 
-import * as actions from 'actions';
+import * as actionTypes from 'actions/types';
 import Form from 'components/Form/Form';
 import fields from 'components/Form/formFields';
 
@@ -10,10 +10,7 @@ import fields from 'components/Form/formFields';
 const Registration = (props) => {
 
     function handleSignInSubmit(formValues) {
-        props.signUp(formValues, () => {
-            props.fetchUser(localStorage.getItem('token'));
-            props.history.push('/');
-        });
+        props.dispatch({ type: actionTypes.SIGN_UP_REQUEST, payload: formValues });
     }
 
     function renderSignInButtons() {
@@ -54,4 +51,4 @@ function mapStateToProps(state) {
     return { authError: state.auth.errorMessage };
 }
 
-export default connect(mapStateToProps, actions)(Registration);
+export default connect(mapStateToProps)(Registration);

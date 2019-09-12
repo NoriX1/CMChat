@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
-import * as actions from 'actions';
+import * as actionTypes from 'actions/types';
 
 const App = (props) => {
 
     useEffect(() => {
         if (localStorage.getItem('token')) {
-            props.fetchUser(localStorage.getItem('token'));
+            props.dispatch({ type: actionTypes.FETCH_USER_REQUEST, payload: {} })
         }
     });
 
@@ -15,4 +15,4 @@ const App = (props) => {
     );
 }
 
-export default connect(null, actions)(App);
+export default connect()(App);
