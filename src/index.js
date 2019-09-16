@@ -17,6 +17,7 @@ import Registration from 'components/Registration/Registration';
 import RoomList from 'components/Rooms/RoomList';
 import CreateRoom from 'components/Rooms/CreateRoom';
 import CloseRoom from 'components/Rooms/CloseRoom';
+import Toasts from 'components/Notifications/Toasts';
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 const sagaMiddleware = createSagaMiddleware();
@@ -31,6 +32,7 @@ ReactDOM.render(
         <Router history={history}>
             <App>
                 <Route path="/" component={Header} />
+                <Route path="/" component={Toasts} />
                 <Route exact path="/" component={Landing} />
                 <Route path="/google/:token" component={GoogleAuth} />
                 <Route path="/register" component={Registration} />

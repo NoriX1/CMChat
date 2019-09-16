@@ -1,7 +1,10 @@
 import { call, put, takeLatest } from 'redux-saga/effects';
 import backend from 'apis/backend';
 import history from '../history';
+import { ToastsStore } from 'react-toasts';
 import * as actionTypes from 'actions/types';
+
+const NOTIFICATIONS_DURATION = 5000;
 
 function signUpApi(formValues) {
     return backend.post('/signup', formValues);
@@ -31,6 +34,7 @@ function* signUp(action) {
         yield call(fetchUser);
         history.push('/rooms');
     } catch (e) {
+        ToastsStore.error(e.response.data.error, NOTIFICATIONS_DURATION);
         yield put({ type: actionTypes.AUTH_ERROR, payload: e.response.data.error });
     }
 }
@@ -43,9 +47,15 @@ function* signIn(action) {
         yield call(fetchUser);
         history.push('/rooms');
     } catch (e) {
-        e.response.status === 401 ?
-            yield put({ type: actionTypes.AUTH_ERROR, payload: 'Email or password are incorrect!' }) :
+        if (e.response.status === 401) {
+            const message = 'Email or password are incorrect!'
+            ToastsStore.error(message, NOTIFICATIONS_DURATION);
+            yield put({ type: actionTypes.AUTH_ERROR, payload: message })
+        } else {
+            ToastsStore.error(e.response.data, NOTIFICATIONS_DURATION);
             yield put({ type: actionTypes.AUTH_ERROR, payload: e.response.data });
+        }
+
     }
 }
 
@@ -67,7 +77,7 @@ function* fetchUser() {
         const user = yield call(getUserApi, localStorage.getItem('token'));
         yield put({ type: actionTypes.CHANGE_USER, payload: user.data });
     } catch (e) {
-        console.warn(e.response.data);
+        ToastsStore.error(e.response.data, NOTIFICATIONS_DURATION);
     }
 }
 
@@ -76,7 +86,7 @@ function* fetchRooms() {
         const response = yield call(fetchRoomsApi, localStorage.getItem('token'));
         yield put({ type: actionTypes.FETCH_ROOMS, payload: response.data })
     } catch (e) {
-        console.warn(e.response.data);
+        ToastsStore.error(e.response.data, NOTIFICATIONS_DURATION);
     }
 }
 
@@ -86,17 +96,17 @@ function* createRoom(action) {
         yield put({ type: actionTypes.CREATE_ROOM, payload: response.data });
         history.push('/rooms');
     } catch (e) {
-        console.warn(e.response.data);
+        ToastsStore.error(e.response.data, NOTIFICATIONS_DURATION);
     }
 }
 
-function* deleteRoom(action){
+function* deleteRoom(action) {
     try {
         const response = yield call(deleteRoomApi, action.payload, localStorage.getItem('token'));
         yield put({ type: actionTypes.DELETE_ROOM, payload: response.data });
         history.push('/rooms');
     } catch (e) {
-        console.warn(e.response.data);
+        ToastsStore.error(e.response.data, NOTIFICATIONS_DURATION);
     }
 }
 
