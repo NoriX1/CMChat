@@ -6,29 +6,18 @@ import * as actionTypes from 'actions/types';
 
 const NOTIFICATIONS_DURATION = 5000;
 
-function signUpApi(formValues) {
-    return backend.post('/signup', formValues);
+function backendApi(type, url, props = {}, token = '') {
+    return backend.request({
+        method: type,
+        url,
+        data: props,
+        headers: { authorization: token }
+    });
 }
-function signInApi(formValues) {
-    return backend.post('/signin', formValues);
-}
-function getUserApi(token) {
-    return backend.get('/auth/user', { headers: { authorization: token } });
-}
-function fetchRoomsApi(token) {
-    return backend.get('/rooms', { headers: { authorization: token } });
-}
-function createRoomApi(formValues, token) {
-    return backend.post('/rooms/new', formValues, { headers: { authorization: token } });
-}
-function deleteRoomApi(id, token) {
-    return backend.delete(`/rooms/${id}`, { headers: { authorization: token } });
-}
-
 
 function* signUp(action) {
     try {
-        const response = yield call(signUpApi, action.payload);
+        const response = yield call(backendApi, 'post', '/signup', action.payload);
         yield put({ type: actionTypes.AUTH_USER, payload: response.data.token });
         localStorage.setItem('token', response.data.token);
         yield call(fetchUser);
@@ -41,7 +30,7 @@ function* signUp(action) {
 
 function* signIn(action) {
     try {
-        const response = yield call(signInApi, action.payload);
+        const response = yield call(backendApi, 'post', '/signin', action.payload);
         yield put({ type: actionTypes.AUTH_USER, payload: response.data.token });
         localStorage.setItem('token', response.data.token);
         yield call(fetchUser);
@@ -74,7 +63,8 @@ function* signOut() {
 
 function* fetchUser() {
     try {
-        const user = yield call(getUserApi, localStorage.getItem('token'));
+        const user = yield call(backendApi, 'get', '/auth/user', {}, localStorage.getItem('token'));
+
         yield put({ type: actionTypes.CHANGE_USER, payload: user.data });
     } catch (e) {
         ToastsStore.error(e.response.data, NOTIFICATIONS_DURATION);
@@ -83,7 +73,8 @@ function* fetchUser() {
 
 function* fetchRooms() {
     try {
-        const response = yield call(fetchRoomsApi, localStorage.getItem('token'));
+        const response = yield call(backendApi, 'get', '/rooms', {}, localStorage.getItem('token'));
+
         yield put({ type: actionTypes.FETCH_ROOMS, payload: response.data })
     } catch (e) {
         ToastsStore.error(e.response.data, NOTIFICATIONS_DURATION);
@@ -92,17 +83,17 @@ function* fetchRooms() {
 
 function* createRoom(action) {
     try {
-        const response = yield call(createRoomApi, action.payload, localStorage.getItem('token'));
+        const response = yield call(backendApi, 'post', '/rooms/new', action.payload, localStorage.getItem('token'));
         yield put({ type: actionTypes.CREATE_ROOM, payload: response.data });
         history.push('/rooms');
     } catch (e) {
-        ToastsStore.error(e.response.data, NOTIFICATIONS_DURATION);
+        ToastsStore.error(e.response.data.error, NOTIFICATIONS_DURATION);
     }
 }
 
 function* deleteRoom(action) {
     try {
-        const response = yield call(deleteRoomApi, action.payload, localStorage.getItem('token'));
+        const response = yield call(backendApi, 'delete', `/rooms/${action.payload}`, {}, localStorage.getItem('token'));
         yield put({ type: actionTypes.DELETE_ROOM, payload: response.data });
         history.push('/rooms');
     } catch (e) {
