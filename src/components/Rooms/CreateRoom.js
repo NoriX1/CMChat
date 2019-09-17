@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import * as actionTypes from 'actions/types';
 import Form from 'components/Form/Form';
 import fields from 'components/Form/formFields';
+import requireAuth from 'components/requireAuth';
 
 const CreateRoom = (props) => {
     function handleSubmit(formValues) {
@@ -38,4 +39,4 @@ const CreateRoom = (props) => {
     );
 }
 
-export default connect()(CreateRoom);
+export default connect()(requireAuth(CreateRoom));

@@ -18,6 +18,7 @@ import RoomList from 'components/Rooms/RoomList';
 import CreateRoom from 'components/Rooms/CreateRoom';
 import CloseRoom from 'components/Rooms/CloseRoom';
 import Toasts from 'components/Notifications/Toasts';
+import Room from 'components/Rooms/Room';
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 const sagaMiddleware = createSagaMiddleware();
@@ -38,6 +39,7 @@ ReactDOM.render(
                 <Route path="/register" component={Registration} />
                 <Route exact path="/rooms" component={RoomList} />
                 <Route path="/rooms/new" component={CreateRoom} />
+                <Route path="/room/:id" component={Room} />
                 <Route path="/rooms/close/:id" component={CloseRoom} />
             </App>
         </Router>

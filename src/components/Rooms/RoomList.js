@@ -17,7 +17,7 @@ const RoomList = (props) => {
             return props.rooms.map((room) => {
                 return (
                     <li key={room._id}>
-                        <Link to={`/rooms/${room._id}`} className="list-group-item list-group-item-action d-flex justify-content-between">
+                        <Link to={`/room/${room._id}`} className="list-group-item list-group-item-action d-flex justify-content-between">
                             <div>{room.name}</div>
                             <object><div>{renderOwnerOrDelete(room)}</div></object>
                         </Link>

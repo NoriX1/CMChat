@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
+import requireAuth from 'components/requireAuth';
 import * as actionTypes from 'actions/types';
 
 import Modal from 'components/Modal/Modal'
@@ -28,4 +29,4 @@ const CloseRoom = (props) => {
     )
 }
 
-export default connect()(CloseRoom);
+export default connect()(requireAuth(CloseRoom));
