@@ -5,4 +5,5 @@ module.exports = function (app) {
     app.post('/rooms/new', auth.requireAuth, roomController.createNewRoom);
     app.get('/rooms', auth.requireAuth, roomController.getAllRooms);
     app.delete('/rooms/:id', auth.requireAuth, roomController.deleteRoom);
+    app.get('/rooms/:id/messages', auth.requireAuth, roomController.getAllMessagesFromRoom);
 }

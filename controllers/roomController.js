@@ -1,6 +1,6 @@
-const Party = require('../models/party');
 const Room = require('../models/room');
 const User = require('../models/user');
+const Message = require('../models/message');
 
 exports.createNewRoom = function (req, res, next) {
     if (!req.body.name) {
@@ -46,17 +46,27 @@ exports.deleteRoom = function (req, res, next) {
     Room.findOneAndDelete({ _id: req.params.id, _owner: req.user.id }, (err, deletedRoom) => {
         if (err) { return next(err); }
         if (!deletedRoom) return res.status(403).send({ error: 'You haven`t got permissions to delete this room' });
-        res.send(deletedRoom)
+        Message.deleteMany({ _room: deletedRoom._id }, (err) => {
+            if (err) { return next(err); }
+            res.send(deletedRoom);
+        });
+
     })
 }
 
-exports.joinRoom = function (req, res, next) {
-    const newParty = new Party({
-        _room: req.body.room,
-        _user: req.user
-    })
-    newParty.save((err, createdParty) => {
-        if (err) { return next(err) };
-        res.send(createdParty);
-    });
+exports.getAllMessagesFromRoom = function (req, res, next) {
+    Message.find({ _room: req.params.id }, (err, messages) => {
+        if (err) { return next(err); }
+        const promises = messages.map((message) => {
+            return User.findOne({ _id: message._user }, { password: 0 }).then((findedUser) => {
+                if (findedUser) {
+                    message._user = findedUser;
+                }
+                return message;
+            });
+        });
+        Promise.all(promises).then((messagesWithUser) => {
+            res.send(messagesWithUser);
+        });
+    }).sort({ dateSent: -1 }).limit(50);
 }
