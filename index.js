@@ -7,6 +7,7 @@ const app = express();
 const router = require('./router');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const socketIO = require('socket.io');
 
 // DB Setup
 mongoose.connect(keys.mongoURI, { useNewUrlParser: true, useCreateIndex: true }, (err) => {
@@ -26,5 +27,7 @@ router(app);
 //Server Setup
 const port = process.env.PORT || 3090;
 const server = http.createServer(app);
+const io = socketIO(server);
+require('./socket')(io);
 server.listen(port);
 console.log('Server listening on:', port);

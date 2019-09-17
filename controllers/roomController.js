@@ -1,3 +1,4 @@
+const Party = require('../models/party');
 const Room = require('../models/room');
 const User = require('../models/user');
 
@@ -47,4 +48,15 @@ exports.deleteRoom = function (req, res, next) {
         if (!deletedRoom) return res.status(403).send({ error: 'You haven`t got permissions to delete this room' });
         res.send(deletedRoom)
     })
+}
+
+exports.joinRoom = function (req, res, next) {
+    const newParty = new Party({
+        _room: req.body.room,
+        _user: req.user
+    })
+    newParty.save((err, createdParty) => {
+        if (err) { return next(err) };
+        res.send(createdParty);
+    });
 }
