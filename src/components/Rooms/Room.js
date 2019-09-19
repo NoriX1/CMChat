@@ -22,11 +22,26 @@ const Room = (props) => {
             props.dispatch({ type: actionTypes.NEW_MESSAGE_REQUEST, payload: message });
         });
         socket.on('error', (error) => {
-            ToastsStore.error(`${error.type} ${error.code}`, 5000);
+            ToastsStore.error(`${error.type}: ${error.code}`, 5000);
             props.history.push('/rooms');
         });
+        socket.on('errorEvent', (error) => {
+            ToastsStore.error(`${error.type}: ${error.code}`, 5000);
+            props.history.push('/rooms');
+        });
+        socket.on('closeRoom', () => {
+            ToastsStore.error(`Room is closed by owner`, 5000);
+            props.history.push('/rooms');
+        });
+        socket.on('joinUser', (user) => {
+            ToastsStore.success(`User ${user.name} is joined!`);
+        });
+        socket.on('disconnectUser', (user) => {
+            ToastsStore.warning(`User ${user.name} is disconnected!`);
+        });
         return () => {
-            props.dispatch({ type: actionTypes.RESET_MESSAGES_REQUEST, payload: {} })
+            props.dispatch({ type: actionTypes.RESET_MESSAGES_REQUEST, payload: {} });
+            socket.emit('disconnectUser', props.match.params.id);
             socket.disconnect();
         }
     });

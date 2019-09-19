@@ -106,7 +106,7 @@ function* fetchMessages(action) {
         const response = yield call(backendApi, 'get', `/rooms/${action.payload}/messages`, {}, localStorage.getItem('token'));
         yield put({ type: actionTypes.FETCH_MESSAGES, payload: response.data });
     } catch (e) {
-        ToastsStore.error(e.response.data, NOTIFICATIONS_DURATION);
+        ToastsStore.error(`${e.response.status}:${e.response.statusText}`, NOTIFICATIONS_DURATION);
     }
 }
 
