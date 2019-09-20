@@ -1,6 +1,7 @@
 const Room = require('../models/room');
 const User = require('../models/user');
 const Message = require('../models/message');
+const Party = require('../models/party');
 
 exports.createNewRoom = function (req, res, next) {
     if (!req.body.name) {
@@ -28,12 +29,18 @@ exports.createNewRoom = function (req, res, next) {
 exports.getAllRooms = function (req, res, next) {
     Room.find((err, rooms) => {
         if (err) { return next(err); }
-        const promises = rooms.map((room) => {
-            return User.findOne({ _id: room._owner }, { name: 1 }).then((findedUser) => {
-                if (findedUser) {
-                    room._owner = findedUser;
-                }
-                return room;
+        const promises = rooms.map(({ _id, _owner, name }) => {
+            return new Promise((resolve, reject) => {
+                let changedRoom = { _id, name };
+                User.findOne({ _id: _owner }, { name: 1 }, (err, findedUser) => {
+                    if (findedUser) {
+                        changedRoom._owner = findedUser;
+                    }
+                    Party.countDocuments({ _room: _id }, (err, countOfUsers) => {
+                        changedRoom.countOfUsers = countOfUsers;
+                        resolve(changedRoom);
+                    });
+                });
             });
         });
         Promise.all(promises).then((roomsWithUser) => {
