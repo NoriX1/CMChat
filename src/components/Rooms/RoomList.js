@@ -18,7 +18,7 @@ const RoomList = (props) => {
                 return (
                     <li key={room._id}>
                         <Link to={`/room/${room._id}`} className="list-group-item list-group-item-action d-flex justify-content-between">
-                            <div>{room.name}</div>
+                            <div>{`${room.name}, ${room.countOfUsers} user(s) joined`}</div>
                             <object><div>{renderOwnerOrDelete(room)}</div></object>
                         </Link>
                     </li>
