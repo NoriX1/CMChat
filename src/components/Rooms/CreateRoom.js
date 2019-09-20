@@ -31,6 +31,7 @@ const CreateRoom = (props) => {
                             fields={fields.newRoom}
                             onSubmit={handleSubmit}
                             renderButtons={renderButtons}
+                            onError={() => { }}
                         />
                     </div>
                 </div>

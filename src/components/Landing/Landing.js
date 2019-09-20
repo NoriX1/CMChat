@@ -26,7 +26,6 @@ const Landing = (props) => {
             </div>
         );
     }
-
     function renderError() {
         if (props.authError) {
             return <div className="alert alert-danger">{props.authError}</div>;
@@ -43,12 +42,12 @@ const Landing = (props) => {
                             fields={fields.signin}
                             onSubmit={handleSignInSubmit}
                             renderButtons={renderSignInButtons}
+                            onError={renderError}
                         />
                     </div>
                 </div>
                 <div className="row">
                     <div className="col">
-                        {renderError()}
                         <div>Haven't got account? <Link to="/register">Create New</Link></div>
                         <div>Or you can</div>
                         <a className="btn btn-primary" href="http://localhost:3090/auth/google">Sign in with Google</a>

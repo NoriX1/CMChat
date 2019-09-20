@@ -37,11 +37,11 @@ const Registration = (props) => {
                         <Form
                             fields={fields.signup}
                             onSubmit={handleSignInSubmit}
+                            onError={renderError}
                             renderButtons={renderSignInButtons}
                         />
                     </div>
                 </div>
-                {renderError()}
             </div>
         </div>
     );

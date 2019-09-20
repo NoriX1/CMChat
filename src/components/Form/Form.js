@@ -21,14 +21,27 @@ const Form = (props) => {
         <div>
             <form onSubmit={props.handleSubmit(props.onSubmit)}>
                 {renderFields()}
+                {props.onError()}
                 {renderButtons()}
             </form>
         </div>
     );
 }
 
-function validate(values) {
-    
+function validate(values, props) {
+    const errors = {};
+    _.each(props.fields, ({ name }) => {
+        if (name === 'email') {
+            const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@(([[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            if (!re.test(values[name])) {
+                errors[name] = 'Email is invalid';
+            }
+        }
+        if (!values[name]) {
+            errors[name] = `You must provide a ${name}`;
+        }
+    });
+    return errors;
 }
 
 export default reduxForm({

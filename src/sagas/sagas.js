@@ -23,7 +23,6 @@ function* signUp(action) {
         yield call(fetchUser);
         history.push('/rooms');
     } catch (e) {
-        ToastsStore.error(e.response.data.error, NOTIFICATIONS_DURATION);
         yield put({ type: actionTypes.AUTH_ERROR, payload: e.response.data.error });
     }
 }
@@ -38,10 +37,8 @@ function* signIn(action) {
     } catch (e) {
         if (e.response.status === 401) {
             const message = 'Email or password are incorrect!'
-            ToastsStore.error(message, NOTIFICATIONS_DURATION);
             yield put({ type: actionTypes.AUTH_ERROR, payload: message })
         } else {
-            ToastsStore.error(e.response.data, NOTIFICATIONS_DURATION);
             yield put({ type: actionTypes.AUTH_ERROR, payload: e.response.data });
         }
 
