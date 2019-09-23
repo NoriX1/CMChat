@@ -10,9 +10,18 @@ const useMountEffect = (fun) => useEffect(fun, [])
 const RoomList = (props) => {
 
     useMountEffect(() => {
-
-        props.dispatch({ type: actionTypes.FETCH_ROOMS_REQUEST, payload: {} })
+        props.dispatch({ type: actionTypes.FETCH_ROOMS_REQUEST, payload: {} });
+        socket.on('updateRoomInList', (roomId) => {
+            props.dispatch({ type: actionTypes.FETCH_ROOM_REQUEST, payload: roomId.id });
+        });
+        socket.on('updateRoomList', () => {
+            props.dispatch({ type: actionTypes.FETCH_ROOMS_REQUEST, payload: {} });
+        });
+        return () => {
+            socket.off();
+        }
     });
+
 
     function renderRoomsList() {
         if (props.rooms.length) {
@@ -20,7 +29,7 @@ const RoomList = (props) => {
                 return (
                     <li key={room._id}>
                         <Link to={`/room/${room._id}`} className="list-group-item list-group-item-action d-flex justify-content-between">
-                            <div>{`${room.name}, ${room.countOfUsers} user(s) joined`}</div>
+                            <div>{`${room.name}, ${room.countOfUsers || 0} user(s) joined`}</div>
                             <object><div>{renderOwnerOrDelete(room)}</div></object>
                         </Link>
                     </li>

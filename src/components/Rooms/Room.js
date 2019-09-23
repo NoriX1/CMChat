@@ -32,10 +32,10 @@ const Room = (props) => {
             props.history.push('/rooms');
         });
         socket.on('joinUser', (user) => {
-            ToastsStore.success(`User ${user.name} is joined!`);
+            ToastsStore.success(`User ${user.name} is joined!`, 5000);
         });
         socket.on('disconnectUser', (user) => {
-            ToastsStore.warning(`User ${user.name} is disconnected!`);
+            ToastsStore.warning(`User ${user.name} is disconnected!`, 5000);
         });
         window.addEventListener('beforeunload', (e) => {
             socket.emit('leaveRoom', props.match.params.id);
@@ -49,6 +49,9 @@ const Room = (props) => {
 
     useEffect(() => {
         scrollToBottom();
+        if (!props.rooms.length) {
+            props.dispatch({ type: actionTypes.FETCH_ROOM_REQUEST, payload: props.match.params.id });
+        }
     });
 
     function onSubmit(formValues) {
@@ -58,6 +61,14 @@ const Room = (props) => {
         }
         socket.emit('message', message);
         props.dispatch(reset('chatForm'));
+    }
+
+    function renderCurrentRoomName() {
+        if (props.rooms.length) {
+            const currentRoom = props.rooms.filter(room => { return room._id === props.match.params.id })[0]
+            return <div className="btn btn-info">Current Room: {currentRoom.name}</div>
+        }
+        
     }
 
     function renderMessageList() {
@@ -88,7 +99,10 @@ const Room = (props) => {
 
     return (
         <div className="container">
-            <Link to="/rooms" className="btn btn-danger">Exit Chat</Link>
+            <div className="d-flex justify-content-between">
+                {renderCurrentRoomName()}
+                <Link to="/rooms" className="btn btn-danger">Exit Chat</Link>
+            </div>
             <ul className="list-group" style={{ maxHeight: "60vh", overflowY: "scroll" }}>
                 {renderMessageList()}
                 <li ref={(el) => { endOfMessagesRef = el }}></li>
@@ -108,7 +122,7 @@ const Room = (props) => {
 }
 
 function mapStateToProps(state) {
-    return { currentUser: state.auth.currentUser, messages: Object.values(state.messages) };
+    return { currentUser: state.auth.currentUser, messages: Object.values(state.messages), rooms: Object.values(state.rooms) };
 }
 
 export default compose(

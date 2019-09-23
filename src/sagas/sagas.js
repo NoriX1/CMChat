@@ -2,6 +2,8 @@ import { call, put, takeLatest } from 'redux-saga/effects';
 import backend from 'apis/backend';
 import history from '../history';
 import { ToastsStore } from 'react-toasts';
+
+import socket from 'apis/socket';
 import * as actionTypes from 'actions/types';
 
 const NOTIFICATIONS_DURATION = 5000;
@@ -78,10 +80,21 @@ function* fetchRooms() {
     }
 }
 
+function* fetchRoom(action) {
+    try {
+        const response = yield call(backendApi, 'get', `/rooms/${action.payload}`, {}, localStorage.getItem('token'));
+
+        yield put({ type: actionTypes.FETCH_ROOM, payload: response.data })
+    } catch (e) {
+        ToastsStore.error(e.response.data, NOTIFICATIONS_DURATION);
+    }
+}
+
 function* createRoom(action) {
     try {
         const response = yield call(backendApi, 'post', '/rooms/new', action.payload, localStorage.getItem('token'));
         yield put({ type: actionTypes.CREATE_ROOM, payload: response.data });
+        socket.emit('updateRoomInList', { id: response.data._id });
         history.push('/rooms');
     } catch (e) {
         ToastsStore.error(e.response.data.error, NOTIFICATIONS_DURATION);
@@ -121,6 +134,7 @@ function* mySaga() {
     yield takeLatest(actionTypes.SIGN_IN_GOOGLE_REQUEST, signInGoogle);
     yield takeLatest(actionTypes.SIGN_OUT_REQUEST, signOut);
     yield takeLatest(actionTypes.FETCH_USER_REQUEST, fetchUser);
+    yield takeLatest(actionTypes.FETCH_ROOM_REQUEST, fetchRoom);
     yield takeLatest(actionTypes.FETCH_ROOMS_REQUEST, fetchRooms);
     yield takeLatest(actionTypes.CREATE_ROOM_REQUEST, createRoom);
     yield takeLatest(actionTypes.DELETE_ROOM_REQUEST, deleteRoom);

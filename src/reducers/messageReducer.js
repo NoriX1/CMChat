@@ -7,7 +7,7 @@ export default (state = {}, action) => {
             return { ...state, ..._.mapKeys(action.payload, '_id') };
         }
         case NEW_MESSAGE: {
-            return { ..._.mapKeys([action.payload], '_id'), ...state };
+            return { [action.payload._id]: action.payload, ...state };
         }
         case RESET_MESSAGES: {
             return {};
