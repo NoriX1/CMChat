@@ -49,6 +49,25 @@ exports.getAllRooms = function (req, res, next) {
     });
 }
 
+exports.getRoom = function (req, res, next) {
+    Room.findOne({ _id: req.params.id }, (err, room) => {
+        if (err) { return next(err); }
+        if (!room) {
+            return res.status(403).send('Room is not found!');
+        }
+        let changedRoom = { _id: room._id, name: room.name };
+        User.findOne({ _id: room._owner }, { name: 1 }, (err, findedUser) => {
+            if (findedUser) {
+                changedRoom._owner = findedUser;
+            }
+            Party.distinct('_user', { '_room': room._id }, (err, partyes) => {
+                changedRoom.countOfUsers = partyes.length;
+                res.send(changedRoom);
+            });
+        });
+    });
+}
+
 exports.deleteRoom = function (req, res, next) {
     Room.findOneAndDelete({ _id: req.params.id, _owner: req.user.id }, (err, deletedRoom) => {
         if (err) { return next(err); }
@@ -58,7 +77,7 @@ exports.deleteRoom = function (req, res, next) {
             res.send(deletedRoom);
         });
 
-    })
+    });
 }
 
 exports.getAllMessagesFromRoom = function (req, res, next) {

@@ -36,6 +36,7 @@ module.exports = function (io) {
                     Party.countDocuments({ _room: roomId, _user: socket.currentUser._id }, (err, count) => {
                         if (count === 1) {
                             io.to(roomId).emit('joinUser', socket.currentUser);
+                            socket.broadcast.emit('updateRoomInList', { id: roomId });
                         }
                     });
                     socket.join(roomId);
@@ -67,6 +68,7 @@ module.exports = function (io) {
             Party.deleteMany({ _room: roomId }, (err) => {
                 if (err) { return io.to(roomId).emit('errorEvent', { type: err.name, code: err.message }); }
                 io.to(roomId).emit('closeRoom');
+                socket.broadcast.emit('updateRoomList');
                 console.log(`Room with id: ${roomId} is closed by owner`);
             });
         });
@@ -76,13 +78,20 @@ module.exports = function (io) {
                 if (err) { return console.log(err); }
                 socket.leave(roomId);
                 console.log(`User ${socket.currentUser.name} : ${socket.id} disconnected ${roomId}`);
-                Party.countDocuments({ _room: roomId, _user: socket.currentUser._id }, (err, count) => {
-                    if (!count) {
-                        io.to(roomId).emit('disconnectUser', socket.currentUser);
+                Room.findById(roomId, (err, res) => {
+                    if (res) {
+                        Party.countDocuments({ _room: roomId, _user: socket.currentUser._id }, (err, count) => {
+                            if (!count) {
+                                io.to(roomId).emit('disconnectUser', socket.currentUser);
+                                socket.broadcast.emit('updateRoomInList', { id: roomId });
+                            }
+                        });
                     }
                 });
             });
         });
+
+        socket.on('updateRoomInList', (roomId) => { socket.broadcast.emit('updateRoomInList', roomId) });
 
         socket.on('disconnect', () => {
             console.log(`***** User ${socket.currentUser.name} : ${socket.id} disconnected *****`);
