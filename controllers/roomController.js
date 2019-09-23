@@ -36,8 +36,8 @@ exports.getAllRooms = function (req, res, next) {
                     if (findedUser) {
                         changedRoom._owner = findedUser;
                     }
-                    Party.countDocuments({ _room: _id }, (err, countOfUsers) => {
-                        changedRoom.countOfUsers = countOfUsers;
+                    Party.distinct('_user', { '_room': _id }, (err, partyes) => {
+                        changedRoom.countOfUsers = partyes.length;
                         resolve(changedRoom);
                     });
                 });

@@ -22,33 +22,26 @@ module.exports = function (io) {
         });
 
         socket.on('joinRoom', (roomId) => {
-            Party.countDocuments({ _room: roomId, _user: socket.currentUser._id }, (err, count) => {
-                if (count) {
-                    return socket.emit('errorEvent', {
-                        type: err ? err.name : 403,
-                        code: err ? err.message : 'You already joined this room. Close other tabs and try again!'
-                    });
-                }
-            });
-
             Room.findOne({ _id: roomId }, (err, findedRoom) => {
                 if (err || !findedRoom) {
                     return socket.emit('errorEvent', { type: err ? err.name : 404, code: err ? err.message : 'Room is not found!' });
                 }
+                new Party({
+                    _room: roomId,
+                    _user: socket.decoded_token.sub
+                }).save((err, savedParty) => {
+                    if (err || !savedParty) {
+                        return socket.emit('errorEvent', { type: err ? err.name : 505, code: err ? err.message : 'Error with joining this room!' });
+                    }
+                    Party.countDocuments({ _room: roomId, _user: socket.currentUser._id }, (err, count) => {
+                        if (count === 1) {
+                            io.to(roomId).emit('joinUser', socket.currentUser);
+                        }
+                    });
+                    socket.join(roomId);
+                    console.log(`User ${socket.currentUser.name} : ${socket.id} connected to ${roomId}`);
+                });
             });
-
-            new Party({
-                _room: roomId,
-                _user: socket.decoded_token.sub
-            }).save((err, savedParty) => {
-                if (err || !savedParty) {
-                    return socket.emit('errorEvent', { type: err ? err.name : 505, code: err ? err.message : 'Error with joining this room!' });
-                }
-            });
-
-            socket.join(roomId);
-            io.to(roomId).emit('joinUser', socket.currentUser);
-            console.log(`User ${socket.currentUser.name} : ${socket.id} connected to ${roomId}`);
         });
 
         socket.on('message', (message) => {
@@ -82,15 +75,16 @@ module.exports = function (io) {
             Party.deleteOne({ _room: roomId, _user: socket.currentUser._id }, (err) => {
                 if (err) { return console.log(err); }
                 socket.leave(roomId);
-                io.to(roomId).emit('disconnectUser', socket.currentUser);
                 console.log(`User ${socket.currentUser.name} : ${socket.id} disconnected ${roomId}`);
+                Party.countDocuments({ _room: roomId, _user: socket.currentUser._id }, (err, count) => {
+                    if (!count) {
+                        io.to(roomId).emit('disconnectUser', socket.currentUser);
+                    }
+                });
             });
         });
 
         socket.on('disconnect', () => {
-            Party.deleteMany({ _user: socket.decoded_token.sub }, (err) => {
-                if (err) { return console.log(err); }
-            });
             console.log(`***** User ${socket.currentUser.name} : ${socket.id} disconnected *****`);
         });
     });
