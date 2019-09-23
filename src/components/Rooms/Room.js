@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
 import requireAuth from 'components/requireAuth';
-import socketIOclient from 'socket.io-client';
+import socket from 'apis/socket';
 import { ToastsStore } from 'react-toasts';
 import { reset, reduxForm, Field } from 'redux-form';
 import { compose } from 'redux';
@@ -11,13 +11,11 @@ import * as actionTypes from 'actions/types';
 const useMountEffect = (fun) => useEffect(fun, []);
 
 const Room = (props) => {
-
-    const socket = socketIOclient(`localhost:3090?token=${localStorage.getItem('token')}`);
     let endOfMessagesRef = React.createRef();
 
     useMountEffect(() => {
         props.dispatch({ type: actionTypes.FETCH_MESSAGES_REQUEST, payload: props.match.params.id });
-        socket.emit('roomInformation', props.match.params.id);
+        socket.emit('joinRoom', props.match.params.id);
         socket.on('message', (message) => {
             props.dispatch({ type: actionTypes.NEW_MESSAGE_REQUEST, payload: message });
         });
@@ -41,8 +39,8 @@ const Room = (props) => {
         });
         return () => {
             props.dispatch({ type: actionTypes.RESET_MESSAGES_REQUEST, payload: {} });
-            socket.emit('disconnectUser', props.match.params.id);
-            socket.disconnect();
+            socket.emit('leaveRoom', props.match.params.id);
+            socket.off();
         }
     });
 

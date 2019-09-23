@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import requireAuth from 'components/requireAuth';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
+import socket from 'apis/socket';
 import * as actionTypes from 'actions/types';
 
 const useMountEffect = (fun) => useEffect(fun, [])
@@ -9,6 +10,7 @@ const useMountEffect = (fun) => useEffect(fun, [])
 const RoomList = (props) => {
 
     useMountEffect(() => {
+
         props.dispatch({ type: actionTypes.FETCH_ROOMS_REQUEST, payload: {} })
     });
 
@@ -28,7 +30,7 @@ const RoomList = (props) => {
     }
 
     function renderOwnerOrDelete(room) {
-        if (props.currentUser._id === room._owner._id) {
+        if (props.currentUser && (props.currentUser._id === room._owner._id)) {
             return (
                 <div>
                     <div className="btn btn-secondary">{`Owner: ${room._owner.name}`}</div>
