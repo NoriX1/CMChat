@@ -37,6 +37,9 @@ const Room = (props) => {
         socket.on('disconnectUser', (user) => {
             ToastsStore.warning(`User ${user.name} is disconnected!`);
         });
+        window.addEventListener('beforeunload', (e) => {
+            socket.emit('leaveRoom', props.match.params.id);
+        });
         return () => {
             props.dispatch({ type: actionTypes.RESET_MESSAGES_REQUEST, payload: {} });
             socket.emit('leaveRoom', props.match.params.id);
