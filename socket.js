@@ -13,9 +13,16 @@ module.exports = function (io) {
     }));
 
     io.on('connect', (socket) => {
-        socket.on('roomInformation', (roomId) => {
+        User.findOne({ _id: socket.decoded_token.sub }, { password: 0 }, (err, findedUser) => {
+            if (err || !findedUser) {
+                return socket.emit('errorEvent', { type: err ? err.name : 404, code: err ? err.message : 'User is not found!' });
+            }
+            socket.currentUser = findedUser;
+            console.log(`***** User ${socket.currentUser.name} : ${socket.id} connected *****`);
+        });
 
-            Party.countDocuments({ _room: roomId, _user: socket.decoded_token.sub }, (err, count) => {
+        socket.on('joinRoom', (roomId) => {
+            Party.countDocuments({ _room: roomId, _user: socket.currentUser._id }, (err, count) => {
                 if (count) {
                     return socket.emit('errorEvent', {
                         type: err ? err.name : 403,
@@ -30,15 +37,6 @@ module.exports = function (io) {
                 }
             });
 
-            User.findOne({ _id: socket.decoded_token.sub }, { password: 0 }, (err, findedUser) => {
-                if (err || !findedUser) {
-                    return socket.emit('errorEvent', { type: err ? err.name : 404, code: err ? err.message : 'User is not found!' });
-                }
-                socket.join(roomId);
-                io.to(roomId).emit('joinUser', findedUser);
-                console.log(`User ${socket.decoded_token.sub} connected to ${roomId}`);
-            });
-
             new Party({
                 _room: roomId,
                 _user: socket.decoded_token.sub
@@ -48,25 +46,24 @@ module.exports = function (io) {
                 }
             });
 
+            socket.join(roomId);
+            io.to(roomId).emit('joinUser', socket.currentUser);
+            console.log(`User ${socket.currentUser.name} : ${socket.id} connected to ${roomId}`);
         });
 
         socket.on('message', (message) => {
-            Room.findOne({ _id: message._room }, (err, findedRoom) => {
+            Room.findOne({ _id: message.room }, (err, findedRoom) => {
                 if (err || !findedRoom) {
                     return socket.emit('errorEvent', { type: err ? err.name : 404, code: err ? err.message : 'Room is not found!' });
                 }
-            });
-            const newMessage = new Message({
-                _room: message.room,
-                _user: socket.decoded_token.sub,
-                content: message.content,
-                dateSent: new Date()
-            });
-            newMessage.save((err, savedMessage) => {
-                if (err) { return console.log(err) };
-                User.findById(savedMessage._user, { password: 0 }, (err, findedUser) => {
+                const newMessage = new Message({
+                    _room: message.room,
+                    _user: socket.currentUser,
+                    content: message.content,
+                    dateSent: new Date()
+                });
+                newMessage.save((err, savedMessage) => {
                     if (err) { return console.log(err) };
-                    savedMessage._user = findedUser;
                     io.to(savedMessage._room).emit('message', savedMessage);
                     console.log(`Message: "${savedMessage.content}" has been sent to room ${savedMessage._room}`);
                 });
@@ -76,21 +73,17 @@ module.exports = function (io) {
         socket.on('closeRoom', (roomId) => {
             Party.deleteMany({ _room: roomId }, (err) => {
                 if (err) { return io.to(roomId).emit('errorEvent', { type: err.name, code: err.message }); }
+                io.to(roomId).emit('closeRoom');
+                console.log(`Room with id: ${roomId} is closed by owner`);
             });
-            console.log(`Room with id: ${roomId} is closed by owner`);
-            io.to(roomId).emit('closeRoom');
-        })
+        });
 
-        socket.on('disconnectUser', (roomId) => {
-            User.findOne({ _id: socket.decoded_token.sub }, { password: 0 }, (err, findedUser) => {
-                if (err || !findedUser) {
-                    return socket.emit('errorEvent', { type: err ? err.name : 404, code: err ? err.message : 'User is not found!' });
-                }
-                Party.deleteOne({ _room: roomId, _user: findedUser._id }, (err) => {
-                    if (err) { return console.log(err); }
-                });
+        socket.on('leaveRoom', (roomId) => {
+            Party.deleteOne({ _room: roomId, _user: socket.currentUser._id }, (err) => {
+                if (err) { return console.log(err); }
                 socket.leave(roomId);
-                io.to(roomId).emit('disconnectUser', findedUser);
+                io.to(roomId).emit('disconnectUser', socket.currentUser);
+                console.log(`User ${socket.currentUser.name} : ${socket.id} disconnected ${roomId}`);
             });
         });
 
@@ -98,8 +91,7 @@ module.exports = function (io) {
             Party.deleteMany({ _user: socket.decoded_token.sub }, (err) => {
                 if (err) { return console.log(err); }
             });
-            console.log(`User ${socket.decoded_token.sub} disconnected`);
+            console.log(`***** User ${socket.currentUser.name} : ${socket.id} disconnected *****`);
         });
-
     });
 }
