@@ -128,6 +128,20 @@ function* resetMessages() {
     yield put({ type: actionTypes.RESET_MESSAGES, payload: {} });
 }
 
+function* fetchUsersFromRoom(action) {
+    try {
+        const response = yield call(backendApi, 'get', `/rooms/${action.payload}/users`, {}, localStorage.getItem('token'));
+        yield put({ type: actionTypes.FETCH_USERS, payload: response.data });
+    } catch (e) {
+        console.log(e);
+        ToastsStore.error(`${e.response.status}:${e.response.statusText}`, NOTIFICATIONS_DURATION);
+    }
+}
+
+function* resetUsers() {
+    yield put({ type: actionTypes.RESET_USERS, payload: {} });
+}
+
 function* mySaga() {
     yield takeLatest(actionTypes.SIGN_UP_REQUEST, signUp);
     yield takeLatest(actionTypes.SIGN_IN_REQUEST, signIn);
@@ -141,6 +155,8 @@ function* mySaga() {
     yield takeLatest(actionTypes.FETCH_MESSAGES_REQUEST, fetchMessages);
     yield takeLatest(actionTypes.RESET_MESSAGES_REQUEST, resetMessages);
     yield takeLatest(actionTypes.NEW_MESSAGE_REQUEST, newMessage);
+    yield takeLatest(actionTypes.FETCH_USERS_REQUEST, fetchUsersFromRoom);
+    yield takeLatest(actionTypes.RESET_USERS_REQUEST, resetUsers);
 }
 
 export default mySaga;

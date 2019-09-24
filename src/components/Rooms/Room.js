@@ -15,6 +15,7 @@ const Room = (props) => {
 
     useMountEffect(() => {
         props.dispatch({ type: actionTypes.FETCH_MESSAGES_REQUEST, payload: props.match.params.id });
+        props.dispatch({ type: actionTypes.FETCH_USERS_REQUEST, payload: props.match.params.id });
         socket.emit('joinRoom', props.match.params.id);
         socket.on('message', (message) => {
             props.dispatch({ type: actionTypes.NEW_MESSAGE_REQUEST, payload: message });
@@ -33,9 +34,11 @@ const Room = (props) => {
         });
         socket.on('joinUser', (user) => {
             ToastsStore.success(`User ${user.name} is joined!`, 5000);
+            props.dispatch({ type: actionTypes.FETCH_USERS_REQUEST, payload: props.match.params.id });
         });
         socket.on('disconnectUser', (user) => {
             ToastsStore.warning(`User ${user.name} is disconnected!`, 5000);
+            props.dispatch({ type: actionTypes.FETCH_USERS_REQUEST, payload: props.match.params.id });
         });
         window.addEventListener('beforeunload', (e) => {
             socket.emit('leaveRoom', props.match.params.id);
@@ -68,7 +71,7 @@ const Room = (props) => {
             const currentRoom = props.rooms.filter(room => { return room._id === props.match.params.id })[0]
             return <div className="btn btn-info">Current Room: {currentRoom.name}</div>
         }
-        
+
     }
 
     function renderMessageList() {
@@ -97,12 +100,23 @@ const Room = (props) => {
         endOfMessagesRef.scrollIntoView({ behavior: 'smooth' });
     }
 
+    function renderListOfUsers() {
+        if (props.users.length) {
+            return props.users.map((user) => {
+                return <li key={user.name} className="btn btn-secondary">{user.name}</li>
+            })
+        }
+    }
+
     return (
         <div className="container">
             <div className="d-flex justify-content-between">
                 {renderCurrentRoomName()}
                 <Link to="/rooms" className="btn btn-danger">Exit Chat</Link>
             </div>
+            <ul>
+                {renderListOfUsers()}
+            </ul>
             <ul className="list-group" style={{ maxHeight: "60vh", overflowY: "scroll" }}>
                 {renderMessageList()}
                 <li ref={(el) => { endOfMessagesRef = el }}></li>
@@ -122,7 +136,12 @@ const Room = (props) => {
 }
 
 function mapStateToProps(state) {
-    return { currentUser: state.auth.currentUser, messages: Object.values(state.messages), rooms: Object.values(state.rooms) };
+    return {
+        currentUser: state.auth.currentUser,
+        messages: Object.values(state.messages),
+        rooms: Object.values(state.rooms),
+        users: Object.values(state.users)
+    };
 }
 
 export default compose(
