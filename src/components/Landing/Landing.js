@@ -50,7 +50,7 @@ const Landing = (props) => {
                     <div className="col">
                         <div>Haven't got account? <Link to="/register">Create New</Link></div>
                         <div>Or you can</div>
-                        <a className="btn btn-primary" href="http://localhost:3090/auth/google">Sign in with Google</a>
+                        <a className="btn btn-primary" href={`${process.env.REACT_APP_BACKEND_URI}/auth/google`}>Sign in with Google</a>
                     </div>
                 </div>
             </div>
