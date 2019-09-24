@@ -20,7 +20,7 @@ mongoose.connect(keys.mongoURI, { useNewUrlParser: true, useCreateIndex: true },
 
 //App Setup
 app.use(morgan('combined'));
-app.use(cors({ origin: 'http://localhost:3000' }));
+app.use(cors({ origin: keys.clientURI }));
 app.use(bodyParser.json({ type: '*/*' }));
 router(app);
 
