@@ -96,3 +96,27 @@ exports.getAllMessagesFromRoom = function (req, res, next) {
         });
     }).sort({ dateSent: -1 }).limit(50);
 }
+
+exports.getAllUsersOfRoom = function (req, res, next) {
+    Room.findOne({ _id: req.params.id }, (err, room) => {
+        if (err) { return next(err); }
+        if (!room) {
+            return res.status(403).send('Room is not found!');
+        }
+        Party.distinct('_user', { '_room': room._id }, (err, partyes) => {
+            if (!partyes.length) {
+                return res.send([]);
+            }
+            const promises = partyes.map((party) => {
+                return User.findOne({ _id: party }, { password: 0 }).then((findedUser) => {
+                    if (findedUser) {
+                        return findedUser;
+                    }
+                });
+            })
+            Promise.all(promises).then((userList) => {
+                res.send(userList);
+            });
+        });
+    });
+}
