@@ -3,7 +3,7 @@ import backend from 'apis/backend';
 import history from '../history';
 import { ToastsStore } from 'react-toasts';
 
-import socket from 'apis/socket';
+//import socket from 'apis/socket';
 import * as actionTypes from 'actions/types';
 
 const NOTIFICATIONS_DURATION = 5000;
@@ -92,9 +92,9 @@ function* fetchRoom(action) {
 
 function* createRoom(action) {
     try {
-        const response = yield call(backendApi, 'post', '/rooms/new', action.payload, localStorage.getItem('token'));
+        const response = yield call(backendApi, 'post', '/rooms/new', action.payload.formValues, localStorage.getItem('token'));
         yield put({ type: actionTypes.CREATE_ROOM, payload: response.data });
-        socket.emit('updateRoomInList', { id: response.data._id });
+        action.payload.callback(response.data._id);
         history.push('/rooms');
     } catch (e) {
         ToastsStore.error(e.response.data.error, NOTIFICATIONS_DURATION);

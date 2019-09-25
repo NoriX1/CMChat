@@ -1,13 +1,14 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useContext } from 'react';
 import requireAuth from 'components/requireAuth';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import socket from 'apis/socket';
+import SocketContext from 'contexts/SocketContext';
 import * as actionTypes from 'actions/types';
 
 const useMountEffect = (fun) => useEffect(fun, [])
 
 const RoomList = (props) => {
+    const socket = useContext(SocketContext);
 
     useMountEffect(() => {
         props.dispatch({ type: actionTypes.FETCH_ROOMS_REQUEST, payload: {} });

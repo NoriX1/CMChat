@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 
@@ -6,10 +6,22 @@ import * as actionTypes from 'actions/types';
 import Form from 'components/Form/Form';
 import fields from 'components/Form/formFields';
 import requireAuth from 'components/requireAuth';
+import SocketContext from 'contexts/SocketContext';
 
 const CreateRoom = (props) => {
+
+    const socket = useContext(SocketContext);
+
     function handleSubmit(formValues) {
-        props.dispatch({ type: actionTypes.CREATE_ROOM_REQUEST, payload: formValues });
+        props.dispatch({
+            type: actionTypes.CREATE_ROOM_REQUEST,
+            payload: {
+                formValues: formValues,
+                callback: (id) => {
+                    socket.emit('updateRoomInList', { id });
+                }
+            }
+        });
     }
 
     function renderButtons() {

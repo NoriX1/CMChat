@@ -1,11 +1,16 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
+
+import SocketContext from 'contexts/SocketContext';
 import * as actionTypes from 'actions/types';
 
 const Header = (props) => {
 
+    const socket = useContext(SocketContext);
+
     function onSignOutClick() {
+        socket.disconnect();
         props.dispatch({ type: actionTypes.SIGN_OUT_REQUEST, payload: {} });
     }
 

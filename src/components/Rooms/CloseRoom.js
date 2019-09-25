@@ -1,13 +1,16 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import requireAuth from 'components/requireAuth';
 import * as actionTypes from 'actions/types';
-import socketIOclient from 'socket.io-client';
+
 
 import Modal from 'components/Modal/Modal'
+import SocketContext from 'contexts/SocketContext';
 
 const CloseRoom = (props) => {
+
+    const socket = useContext(SocketContext);
 
     function renderActions() {
         return (
@@ -15,7 +18,6 @@ const CloseRoom = (props) => {
                 <Link to="/rooms" className="btn btn-secondary">Cancel</Link>
                 <button className="btn btn-primary" onClick={() => {
                     props.dispatch({ type: actionTypes.DELETE_ROOM_REQUEST, payload: props.match.params.id });
-                    const socket = socketIOclient(`localhost:3090?token=${localStorage.getItem('token')}`);
                     socket.emit('closeRoom', props.match.params.id);
                 }}>Confirm</button>
             </React.Fragment>

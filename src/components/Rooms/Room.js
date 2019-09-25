@@ -1,17 +1,19 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useContext } from 'react';
 import { connect } from 'react-redux';
 import requireAuth from 'components/requireAuth';
-import socket from 'apis/socket';
 import { ToastsStore } from 'react-toasts';
 import { reset, reduxForm, Field } from 'redux-form';
 import { compose } from 'redux';
 import { Link } from 'react-router-dom';
+
 import * as actionTypes from 'actions/types';
+import SocketContext from 'contexts/SocketContext';
 
 const useMountEffect = (fun) => useEffect(fun, []);
 
 const Room = (props) => {
     let endOfMessagesRef = React.createRef();
+    const socket = useContext(SocketContext);
 
     useMountEffect(() => {
         props.dispatch({ type: actionTypes.FETCH_MESSAGES_REQUEST, payload: props.match.params.id });
