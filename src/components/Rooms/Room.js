@@ -42,9 +42,9 @@ const Room = (props) => {
             ToastsStore.warning(`User ${user.name} is disconnected!`, 5000);
             props.dispatch({ type: actionTypes.FETCH_USERS_REQUEST, payload: props.match.params.id });
         });
-        window.addEventListener('beforeunload', (e) => {
+        window.onunload = window.onbeforeunload = () => {
             socket.emit('leaveRoom', props.match.params.id);
-        });
+        }
         return () => {
             props.dispatch({ type: actionTypes.RESET_MESSAGES_REQUEST, payload: {} });
             socket.emit('leaveRoom', props.match.params.id);
@@ -62,7 +62,7 @@ const Room = (props) => {
     function onSubmit(formValues) {
         const message = {
             room: props.match.params.id,
-            content: formValues.content
+            content: formValues.content.replace(/(^\s+|\s+$)/g, '')
         }
         socket.emit('message', message);
         props.dispatch(reset('chatForm'));
@@ -131,7 +131,7 @@ const Room = (props) => {
                     </ul>
                     <form onSubmit={props.handleSubmit(onSubmit)}>
                         <div className="d-flex">
-                            <Field name="content" component="textarea" className="form-control" placeholder="Enter your message" style={{resize: 'none'}} />
+                            <Field name="content" component="textarea" className="form-control" placeholder="Enter your message" style={{ resize: 'none' }} />
                             <button type="submit" className="btn btn-primary">Send</button>
                         </div>
                     </form>
@@ -150,8 +150,19 @@ function mapStateToProps(state) {
     };
 }
 
+function validate(values) {
+    const errors = {}
+    if (!values.content) {
+        errors['content'] = 'Empty message';
+    }
+    if(values.content && values.content.replace(/(^\s+|\s+$)/g, '') === ''){
+        errors['content'] = 'Empty message';
+    }
+    return errors;
+}
+
 export default compose(
     connect(mapStateToProps),
     requireAuth,
-    reduxForm({ form: 'chatForm' })
+    reduxForm({ form: 'chatForm', validate })
 )(Room);
