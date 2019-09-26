@@ -12,14 +12,17 @@ const CloseRoom = (props) => {
 
     const socket = useContext(SocketContext);
 
+    function onClose() {
+        return new Promise((resolve, reject) => {
+            props.dispatch({ type: actionTypes.DELETE_ROOM_REQUEST, payload: { id: props.match.params.id, resolve, reject } });
+        }).then(() => { socket.emit('closeRoom', props.match.params.id) });
+    }
+
     function renderActions() {
         return (
             <React.Fragment>
                 <Link to="/rooms" className="btn btn-secondary">Cancel</Link>
-                <button className="btn btn-primary" onClick={() => {
-                    props.dispatch({ type: actionTypes.DELETE_ROOM_REQUEST, payload: props.match.params.id });
-                    socket.emit('closeRoom', props.match.params.id);
-                }}>Confirm</button>
+                <button className="btn btn-primary" onClick={onClose}>Confirm</button>
             </React.Fragment>
         );
     }

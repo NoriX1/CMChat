@@ -54,11 +54,12 @@ function* signInGoogle(action) {
     history.push('/rooms');
 }
 
-function* signOut() {
+function* signOut(action) {
     yield put({ type: actionTypes.AUTH_USER, payload: '' });
     yield put({ type: actionTypes.CHANGE_USER, payload: {} });
     localStorage.removeItem('token');
     history.push('/');
+    action.payload.resolve();
 }
 
 function* fetchUser() {
@@ -104,8 +105,9 @@ function* createRoom(action) {
 
 function* deleteRoom(action) {
     try {
-        const response = yield call(backendApi, 'delete', `/rooms/${action.payload}`, {}, localStorage.getItem('token'));
+        const response = yield call(backendApi, 'delete', `/rooms/${action.payload.id}`, {}, localStorage.getItem('token'));
         yield put({ type: actionTypes.DELETE_ROOM, payload: response.data });
+        action.payload.resolve();
         history.push('/rooms');
     } catch (e) {
         ToastsStore.error(e.response.data, NOTIFICATIONS_DURATION);
@@ -134,7 +136,6 @@ function* fetchUsersFromRoom(action) {
         const response = yield call(backendApi, 'get', `/rooms/${action.payload}/users`, {}, localStorage.getItem('token'));
         yield put({ type: actionTypes.FETCH_USERS, payload: response.data });
     } catch (e) {
-        console.log(e);
         ToastsStore.error(`${e.response.status}:${e.response.statusText}`, NOTIFICATIONS_DURATION);
     }
 }
