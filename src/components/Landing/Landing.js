@@ -16,7 +16,9 @@ const Landing = (props) => {
     });
 
     function handleSignInSubmit(formValues) {
-        props.dispatch({ type: actionTypes.SIGN_IN_REQUEST, payload: formValues })
+        return new Promise((resolve, reject) => {
+            props.dispatch({ type: actionTypes.SIGN_IN_REQUEST, payload: { formValues, resolve, reject } });
+        });
     }
 
     function renderSignInButtons() {
@@ -25,11 +27,6 @@ const Landing = (props) => {
                 <button type="submit" className="btn btn-success">Sign In</button>
             </div>
         );
-    }
-    function renderError() {
-        if (props.authError) {
-            return <div className="alert alert-danger">{props.authError}</div>;
-        }
     }
 
     return (
@@ -42,7 +39,6 @@ const Landing = (props) => {
                             fields={fields.signin}
                             onSubmit={handleSignInSubmit}
                             renderButtons={renderSignInButtons}
-                            onError={renderError}
                         />
                     </div>
                 </div>
@@ -59,7 +55,7 @@ const Landing = (props) => {
 }
 
 function mapStateToProps(state) {
-    return { authError: state.auth.errorMessage, auth: state.auth.authenticated };
+    return { auth: state.auth.authenticated };
 }
 
 export default connect(mapStateToProps)(Landing);

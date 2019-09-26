@@ -21,7 +21,7 @@ const Form = (props) => {
         <div>
             <form onSubmit={props.handleSubmit(props.onSubmit)}>
                 {renderFields()}
-                {props.onError()}
+                {props.error && <div className="alert alert-danger">{props.error}</div>}
                 {renderButtons()}
             </form>
         </div>

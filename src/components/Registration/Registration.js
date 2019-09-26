@@ -9,23 +9,19 @@ import fields from 'components/Form/formFields';
 
 const Registration = (props) => {
 
-    function handleSignInSubmit(formValues) {
-        props.dispatch({ type: actionTypes.SIGN_UP_REQUEST, payload: formValues });
+    function handleSignUpSubmit(formValues) {
+        return new Promise((resolve, reject) => {
+            props.dispatch({ type: actionTypes.SIGN_UP_REQUEST, payload: { formValues, resolve, reject } });
+        });
     }
 
-    function renderSignInButtons() {
+    function renderSignUpButtons() {
         return (
             <div>
                 <Link to="/" className="btn btn-danger">Cancel</Link>
                 <button type="submit" className="btn btn-success">Create account</button>
             </div>
         );
-    }
-
-    function renderError() {
-        if (props.authError) {
-            return <div className="alert alert-danger">{props.authError}</div>;
-        }
     }
 
     return (
@@ -36,9 +32,8 @@ const Registration = (props) => {
                     <div className="col d-flex justify-content-center">
                         <Form
                             fields={fields.signup}
-                            onSubmit={handleSignInSubmit}
-                            onError={renderError}
-                            renderButtons={renderSignInButtons}
+                            onSubmit={handleSignUpSubmit}
+                            renderButtons={renderSignUpButtons}
                         />
                     </div>
                 </div>
@@ -47,8 +42,4 @@ const Registration = (props) => {
     );
 }
 
-function mapStateToProps(state) {
-    return { authError: state.auth.errorMessage };
-}
-
-export default connect(mapStateToProps)(Registration);
+export default connect()(Registration);

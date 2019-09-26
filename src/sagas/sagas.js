@@ -2,6 +2,7 @@ import { call, put, takeLatest } from 'redux-saga/effects';
 import backend from 'apis/backend';
 import history from '../history';
 import { ToastsStore } from 'react-toasts';
+import { SubmissionError } from 'redux-form';
 
 //import socket from 'apis/socket';
 import * as actionTypes from 'actions/types';
@@ -19,31 +20,31 @@ function backendApi(type, url, props = {}, token = '') {
 
 function* signUp(action) {
     try {
-        const response = yield call(backendApi, 'post', '/signup', action.payload);
+        const response = yield call(backendApi, 'post', '/signup', action.payload.formValues);
         yield put({ type: actionTypes.AUTH_USER, payload: response.data.token });
         localStorage.setItem('token', response.data.token);
         yield call(fetchUser);
+        action.payload.resolve();
         history.push('/rooms');
     } catch (e) {
-        yield put({ type: actionTypes.AUTH_ERROR, payload: e.response.data.error });
+        action.payload.reject(new SubmissionError({ _error: e.response.data.error }));
     }
 }
 
 function* signIn(action) {
     try {
-        const response = yield call(backendApi, 'post', '/signin', action.payload);
+        const response = yield call(backendApi, 'post', '/signin', action.payload.formValues);
         yield put({ type: actionTypes.AUTH_USER, payload: response.data.token });
         localStorage.setItem('token', response.data.token);
         yield call(fetchUser);
+        action.payload.resolve();
         history.push('/rooms');
     } catch (e) {
         if (e.response.status === 401) {
-            const message = 'Email or password are incorrect!'
-            yield put({ type: actionTypes.AUTH_ERROR, payload: message })
+            action.payload.reject(new SubmissionError({ _error: 'Incorrect email or password' }));
         } else {
-            yield put({ type: actionTypes.AUTH_ERROR, payload: e.response.data });
+            action.payload.reject(new SubmissionError({ _error: e.response.data || 'Authentication failed' }));
         }
-
     }
 }
 
@@ -94,10 +95,10 @@ function* createRoom(action) {
     try {
         const response = yield call(backendApi, 'post', '/rooms/new', action.payload.formValues, localStorage.getItem('token'));
         yield put({ type: actionTypes.CREATE_ROOM, payload: response.data });
-        action.payload.callback(response.data._id);
+        action.payload.resolve(response.data._id);
         history.push('/rooms');
     } catch (e) {
-        ToastsStore.error(e.response.data.error, NOTIFICATIONS_DURATION);
+        action.payload.reject(new SubmissionError({ _error: e.response.data.error }));
     }
 }
 

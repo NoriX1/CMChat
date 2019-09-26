@@ -13,15 +13,10 @@ const CreateRoom = (props) => {
     const socket = useContext(SocketContext);
 
     function handleSubmit(formValues) {
-        props.dispatch({
-            type: actionTypes.CREATE_ROOM_REQUEST,
-            payload: {
-                formValues: formValues,
-                callback: (id) => {
-                    socket.emit('updateRoomInList', { id });
-                }
-            }
-        });
+        return new Promise((resolve, reject) => {
+            props.dispatch({ type: actionTypes.CREATE_ROOM_REQUEST, payload: { formValues: formValues, resolve, reject } });
+        }).then((id) => { socket.emit('updateRoomInList', { id }) });
+
     }
 
     function renderButtons() {
@@ -43,7 +38,6 @@ const CreateRoom = (props) => {
                             fields={fields.newRoom}
                             onSubmit={handleSubmit}
                             renderButtons={renderButtons}
-                            onError={() => { }}
                         />
                     </div>
                 </div>
