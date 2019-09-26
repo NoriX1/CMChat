@@ -16,20 +16,16 @@ const Header = (props) => {
     }
 
     return (
-        <div className="header">
-            <div className="container">
-                <div className="row mt-3 mb-3">
-                    <div className="col-6 text-left">
-                        {props.auth ?
-                            <Link to="/rooms"><h4>CMChat</h4></Link> :
-                            <Link to="/"><h4>CMChat</h4></Link>}
-                    </div>
-                    {props.auth &&
-                        <div className="col-6 text-right">
-                            <div className="btn btn-outline-info">Welcome{props.currentUser ? `, ${props.currentUser.name}` : ` !`}</div>
-                            <button className="btn btn-danger" onClick={onSignOutClick}>Sign Out</button>
-                        </div>}
-                </div>
+        <div className="navbar navbar-expand-md navbar-dark bg-dark shadow p-2 mb-2">
+            {props.auth ?
+                <Link className="navbar-brand" to="/rooms"><h4>CMChat</h4></Link> :
+                <Link className="navbar-brand" to="/"><h4>CMChat</h4></Link>}
+            <div className="navbar ml-auto">
+                {props.auth &&
+                    <div className="ml-auto">
+                        <div className="btn btn-outline-info mr-2">Welcome{props.currentUser ? `, ${props.currentUser.name}` : ` !`}</div>
+                        <button className="btn btn-danger" onClick={onSignOutClick}>Sign Out</button>
+                    </div>}
             </div>
         </div>
     );

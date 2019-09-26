@@ -18,8 +18,9 @@ const Form = (props) => {
     }
 
     return (
-        <div>
+        <div className="ui-form">
             <form onSubmit={props.handleSubmit(props.onSubmit)}>
+                <h1 className="h3 mb3 font-weight-normal">{props.title}</h1>
                 {renderFields()}
                 {props.error && <div className="alert alert-danger">{props.error}</div>}
                 {renderButtons()}

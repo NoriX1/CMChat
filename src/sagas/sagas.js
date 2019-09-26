@@ -4,7 +4,6 @@ import history from '../history';
 import { ToastsStore } from 'react-toasts';
 import { SubmissionError } from 'redux-form';
 
-//import socket from 'apis/socket';
 import * as actionTypes from 'actions/types';
 
 const NOTIFICATIONS_DURATION = 5000;
