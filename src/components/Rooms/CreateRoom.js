@@ -21,9 +21,9 @@ const CreateRoom = (props) => {
 
     function renderButtons() {
         return (
-            <div>
-                <Link to="/rooms" className="btn btn-danger">Cancel</Link>
-                <button type="submit" className="btn btn-success">Create room</button>
+            <div className="d-flex justify-content-between">
+                <Link to="/rooms" className="btn btn-danger w-50">Cancel</Link>
+                <button type="submit" className="btn btn-success w-50">Create room</button>
             </div>
         );
     }
@@ -31,10 +31,10 @@ const CreateRoom = (props) => {
     return (
         <div>
             <div className="container text-center">
-                <h3>Creating a new chat room</h3>
-                <div className="row">
-                    <div className="col d-flex justify-content-center">
+                <div className="row d-flex justify-content-center">
+                    <div className="col col-md-6 col-lg-4 col-xl-3">
                         <Form
+                            title='Add new room'
                             fields={fields.newRoom}
                             onSubmit={handleSubmit}
                             renderButtons={renderButtons}

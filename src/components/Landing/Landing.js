@@ -33,21 +33,17 @@ const Landing = (props) => {
     return (
         <div className="landing">
             <div className="container text-center">
-                <div className="row">
-                    <div className="col d-flex justify-content-center">
+                <div className="row d-flex justify-content-center">
+                    <div className="col col-md-6 col-lg-4 col-xl-3">
                         <Form
                             title='Sign In'
                             fields={fields.signin}
                             onSubmit={handleSignInSubmit}
                             renderButtons={renderSignInButtons}
                         />
-                    </div>
-                </div>
-                <div className="row">
-                    <div className="col">
+                        <div>Or</div>
+                        <a className="btn btn-primary mb-2" href={`${process.env.REACT_APP_BACKEND_URI}/auth/google`}>Sign in with Google</a>
                         <div>Haven't got account? <Link to="/register">Create New</Link></div>
-                        <div>Or you can</div>
-                        <a className="btn btn-primary" href={`${process.env.REACT_APP_BACKEND_URI}/auth/google`}>Sign in with Google</a>
                     </div>
                 </div>
             </div>

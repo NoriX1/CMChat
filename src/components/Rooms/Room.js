@@ -80,7 +80,7 @@ const Room = (props) => {
         if (props.messages.length) {
             return props.messages.slice(0).reverse().map(message => {
                 return (
-                    <li key={message._id} className="list-group-item">
+                    <li key={message._id} className="">
                         <div>
                             User
                             <span style={{ fontWeight: "bold" }}> {message._user.name} </span>
@@ -89,7 +89,7 @@ const Room = (props) => {
                                 {` ${new Date(message.dateSent).toLocaleDateString()}, ${new Date(message.dateSent).toLocaleTimeString()} `}
                             </span>
                         </div>
-                        <div className="alert alert-secondary">
+                        <div className="alert alert-secondary p-2">
                             {message.content}
                         </div>
                     </li>
@@ -105,34 +105,38 @@ const Room = (props) => {
     function renderListOfUsers() {
         if (props.users.length) {
             return props.users.map((user) => {
-                return <li key={user.name} className="btn btn-secondary">{user.name}</li>
+                return <li key={user.name} className="btn btn-secondary mr-1">{user.name}</li>
             })
         }
     }
 
     return (
         <div className="container">
-            <div className="d-flex justify-content-between">
-                {renderCurrentRoomName()}
-                <Link to="/rooms" className="btn btn-danger">Exit Chat</Link>
-            </div>
-            <ul>
-                {renderListOfUsers()}
-            </ul>
-            <ul className="list-group" style={{ maxHeight: "60vh", overflowY: "scroll" }}>
-                {renderMessageList()}
-                <li ref={(el) => { endOfMessagesRef = el }}></li>
-            </ul>
-            <form onSubmit={props.handleSubmit(onSubmit)}>
-                <div className="row">
-                    <div className="col-11">
-                        <Field name="content" component="textarea" className="form-control" placeholder="Enter your message" />
+            <div className="row">
+                <div className="col">
+                    <div className="d-flex justify-content-between mb-1">
+                        {renderCurrentRoomName()}
+                        <Link to="/rooms" className="btn btn-danger">Exit Chat</Link>
                     </div>
-                    <div className="col-1">
-                        <button type="submit" className="btn btn-primary">Send</button>
-                    </div>
+                    <ul>
+                        {renderListOfUsers()}
+                    </ul>
                 </div>
-            </form>
+            </div>
+            <div className="row">
+                <div className="col">
+                    <ul style={{ maxHeight: "55vh", overflowY: "scroll" }}>
+                        {renderMessageList()}
+                        <li ref={(el) => { endOfMessagesRef = el }}></li>
+                    </ul>
+                    <form onSubmit={props.handleSubmit(onSubmit)}>
+                        <div className="d-flex">
+                            <Field name="content" component="textarea" className="form-control" placeholder="Enter your message" style={{resize: 'none'}} />
+                            <button type="submit" className="btn btn-primary">Send</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     );
 }

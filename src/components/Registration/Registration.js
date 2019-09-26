@@ -17,9 +17,9 @@ const Registration = (props) => {
 
     function renderSignUpButtons() {
         return (
-            <div>
-                <Link to="/" className="btn btn-danger">Cancel</Link>
-                <button type="submit" className="btn btn-success">Create account</button>
+            <div className="d-flex justify-content-between">
+                <Link to="/" className="btn btn-danger w-50">Cancel</Link>
+                <button type="submit" className="btn btn-success w-50">Create account</button>
             </div>
         );
     }
@@ -27,10 +27,10 @@ const Registration = (props) => {
     return (
         <div>
             <div className="container text-center">
-                <h3>Creating a new account</h3>
-                <div className="row">
-                    <div className="col d-flex justify-content-center">
+                <div className="row d-flex justify-content-center">
+                    <div className="col col col-md-6 col-lg-4 col-xl-4">
                         <Form
+                            title='Create new account'
                             fields={fields.signup}
                             onSubmit={handleSignUpSubmit}
                             renderButtons={renderSignUpButtons}

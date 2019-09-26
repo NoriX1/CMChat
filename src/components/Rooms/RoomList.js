@@ -28,10 +28,10 @@ const RoomList = (props) => {
         if (props.rooms.length) {
             return props.rooms.map((room) => {
                 return (
-                    <li key={room._id}>
-                        <Link to={`/room/${room._id}`} className="list-group-item list-group-item-action d-flex justify-content-between">
+                    <li className="mb-1" key={room._id}>
+                        <Link to={`/room/${room._id}`} className="list-group-item list-group-item-dark list-group-item-action d-flex justify-content-between align-items-center">
                             <div>{`${room.name}, ${room.countOfUsers || 0} user(s) joined`}</div>
-                            <object><div>{renderOwnerOrDelete(room)}</div></object>
+                            <object>{renderOwnerOrDelete(room)}</object>
                         </Link>
                     </li>
                 );
@@ -52,8 +52,8 @@ const RoomList = (props) => {
     }
 
     return (
-        <div className="container">
-            <ul className="list-group">{renderRoomsList()}</ul>
+        <div className="container text-center">
+            <ul className="list-group mb-3" style={{maxHeight: '70vh', overflowY: 'auto'}}>{renderRoomsList()}</ul>
             <Link className="btn btn-primary" to="/rooms/new">Create new</Link>
         </div>
     )
