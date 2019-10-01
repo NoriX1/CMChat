@@ -143,6 +143,16 @@ function* resetUsers() {
     yield put({ type: actionTypes.RESET_USERS, payload: {} });
 }
 
+function* editUser(action) {
+    try {
+        const response = yield call(backendApi, 'put', '/users/edit', action.payload.formValues, localStorage.getItem('token'));
+        yield put({ type: actionTypes.CHANGE_USER, payload: response.data });
+        action.payload.resolve();
+    } catch (e) {
+        action.payload.reject(new SubmissionError({ _error: e.response.data.error }));
+    }
+}
+
 function* mySaga() {
     yield takeLatest(actionTypes.SIGN_UP_REQUEST, signUp);
     yield takeLatest(actionTypes.SIGN_IN_REQUEST, signIn);
@@ -158,6 +168,7 @@ function* mySaga() {
     yield takeLatest(actionTypes.NEW_MESSAGE_REQUEST, newMessage);
     yield takeLatest(actionTypes.FETCH_USERS_REQUEST, fetchUsersFromRoom);
     yield takeLatest(actionTypes.RESET_USERS_REQUEST, resetUsers);
+    yield takeLatest(actionTypes.EDIT_USER_REQUEST, editUser);
 }
 
 export default mySaga;

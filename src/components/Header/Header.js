@@ -23,7 +23,7 @@ const Header = (props) => {
             <div className="navbar ml-auto">
                 {props.auth &&
                     <div className="ml-auto">
-                        <div className="btn btn-outline-info mr-2">Hi{props.currentUser ? `, ${props.currentUser.name}!` : ` !`}</div>
+                        <Link to="/profile" className="btn btn-outline-info mr-2">Hi{props.currentUser ? `, ${props.currentUser.name}!` : ` !`}</Link>
                         <button className="btn btn-danger" onClick={onSignOutClick}>Sign Out</button>
                     </div>}
             </div>

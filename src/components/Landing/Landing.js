@@ -34,6 +34,10 @@ const Landing = (props) => {
         <div className="landing">
             <div className="container text-center">
                 <div className="row d-flex justify-content-center">
+                    <div className="col-12">
+                        <h5>This is a simple chat working on React.js</h5>
+                        <h6>To use this chat you should sign up or sign in</h6>
+                    </div>
                     <div className="col col-md-6 col-lg-4 col-xl-3">
                         <Form
                             title='Sign In'

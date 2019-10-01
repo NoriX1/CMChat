@@ -105,8 +105,8 @@ const Room = (props) => {
     function renderListOfUsers() {
         if (props.users.length) {
             return props.users.map((user) => {
-                return <li key={user.name} className="btn btn-secondary mr-1">{user.name}</li>
-            })
+                return <li key={user.name} className="btn btn-secondary mr-1 mb-1">{user.name}</li>
+            });
         }
     }
 

@@ -20,7 +20,7 @@ const Form = (props) => {
     return (
         <div className="mt-5">
             <form onSubmit={props.handleSubmit(props.onSubmit)}>
-                <h1 className="h3 mb3 font-weight-bold">{props.title}</h1>
+                {props.title && <h1 className="h3 mb3 font-weight-bold">{props.title}</h1>}
                 {renderFields()}
                 {props.error && <div className="alert alert-danger">{props.error}</div>}
                 {renderButtons()}
@@ -47,7 +47,7 @@ function validate(values, props) {
                 errors[name] = 'Only letters and numbers (and _ ) are allowed';
             }
         }
-        if(name === 'password'){
+        if (name === 'password') {
             if (values[name] && values[name].length < 6) {
                 errors[name] = 'Min length of password is 6 symbols';
             }
