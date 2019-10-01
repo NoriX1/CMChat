@@ -40,7 +40,7 @@ exports.signup = function (req, res, next) {
             if (existingUser) {
                 return res.status(422).send({ error: `Name "${name}" is already is in use` });
             }
-            
+
             const user = new User({
                 name: name,
                 email: email,
@@ -73,4 +73,26 @@ exports.sendUser = function (req, res, next) {
         email: req.user.email
     });
     res.send(user);
+}
+
+exports.editUser = function (req, res, next) {
+    if (!req.body.name) {
+        return res.status(422).send({ error: "You must provide a name of user" });
+    }
+    if (!/^[A-Za-zА-Я-а-я0-9_]+$/.test(req.body.name)) {
+        return res.status(422).send({ error: "Only letters and numbers (and _ ) are allowed in name" });
+    }
+    if (req.body.name.length > 10) {
+        return res.status(422).send({ error: "Max length of name is 10 characters" });
+    }
+    User.findOne({ name: req.body.name }, (err, findedUser) => {
+        if (err) { return next(err) };
+        if (findedUser) {
+            return res.status(422).send({ error: `User with name "${req.body.name}" is already exists` });
+        }
+        User.findOneAndUpdate({ _id: req.user.id }, { name: req.body.name }, { new: true, projection: { password: 0 } }, (err, editedUser) => {
+            if (err) { return next(err) };
+            res.send(editedUser);
+        });
+    });
 }

@@ -47,7 +47,7 @@ module.exports = function (io) {
 
         socket.on('message', (message) => {
             Room.findOne({ _id: message.room }, (err, findedRoom) => {
-                if(message.content.length > 4096){
+                if (message.content.length > 4096) {
                     return socket.emit('errorEvent', { type: err ? err.name : 404, code: err ? err.message : 'Max length of message is 4096 letters' });
                 }
                 if (err || !findedRoom) {
@@ -95,6 +95,7 @@ module.exports = function (io) {
         });
 
         socket.on('updateRoomInList', (roomId) => { socket.broadcast.emit('updateRoomInList', roomId) });
+        socket.on('updateRoomList', () => { socket.broadcast.emit('updateRoomList') });
 
         socket.on('disconnect', () => {
             console.log(`***** User ${socket.currentUser.name} : ${socket.id} disconnected *****`);

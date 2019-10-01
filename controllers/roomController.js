@@ -11,7 +11,7 @@ exports.createNewRoom = function (req, res, next) {
         return res.status(422).send({ error: "Only letters and numbers (and _ ) are allowed in name" });
     }
     if (req.body.name.length > 10) {
-        return res.status(422).send({ error: "Max length of name 10 characters" });
+        return res.status(422).send({ error: "Max length of name is 10 characters" });
     }
 
     Room.findOne({ name: req.body.name }, function (err, existingRoom) {
