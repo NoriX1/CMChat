@@ -155,8 +155,11 @@ function validate(values) {
     if (!values.content) {
         errors['content'] = 'Empty message';
     }
-    if(values.content && values.content.replace(/(^\s+|\s+$)/g, '') === ''){
+    if (values.content && values.content.replace(/(^\s+|\s+$)/g, '') === '') {
         errors['content'] = 'Empty message';
+    }
+    if (values.content && values.content.length > 4096) {
+        values.content = values.content.slice(0, 4096);
     }
     return errors;
 }

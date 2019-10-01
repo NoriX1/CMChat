@@ -38,6 +38,20 @@ function validate(values, props) {
                 errors[name] = 'Email is invalid';
             }
         }
+        if (name === 'name') {
+            if (values[name] && values[name].length > 10) {
+                errors[name] = 'Max length 10 characters';
+            }
+            const re = /^[A-Za-zА-Я-а-я0-9_]+$/;
+            if (!re.test(values[name])) {
+                errors[name] = 'Only letters and numbers (and _ ) are allowed';
+            }
+        }
+        if(name === 'password'){
+            if (values[name] && values[name].length < 6) {
+                errors[name] = 'Min length of password is 6 symbols';
+            }
+        }
         if (!values[name]) {
             errors[name] = `You must provide a ${name}`;
         }
