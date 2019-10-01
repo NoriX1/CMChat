@@ -6,7 +6,7 @@ const ExtractJwt = require('passport-jwt').ExtractJwt;
 const LocalStrategy = require('passport-local');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 
-const localOptions = { usernameField: 'email' }
+const localOptions = { usernameField: 'email', passwordField: 'signinpassword' }
 const localLogin = new LocalStrategy(localOptions, function (email, password, done) {
     User.findOne({ email: email }, function (err, user) {
         if (err) return done(err);
@@ -47,14 +47,20 @@ const googleAuth = new GoogleStrategy(googleOptions, function (accessToken, refr
         if (existingUser) {
             done(null, existingUser);
         } else {
-            const user = new User({
-                name: profile.displayName,
-                googleID: profile.id,
-                email: profile.emails[0].value
-            });
-            user.save((err) => {
+            User.findOne({ name: profile.displayName }, (err, existingName) => {
                 if (err) return done(err, false);
-                return done(null, user);
+                let user = new User({
+                    name: profile.displayName,
+                    googleID: profile.id,
+                    email: profile.emails[0].value
+                })
+                if (existingName) {
+                    user.name = 'u#' + user.name;
+                }
+                user.save((err) => {
+                    if (err) return done(err, false);
+                    return done(null, user);
+                });
             });
         }
     });

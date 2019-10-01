@@ -47,6 +47,9 @@ module.exports = function (io) {
 
         socket.on('message', (message) => {
             Room.findOne({ _id: message.room }, (err, findedRoom) => {
+                if(message.content.length > 4096){
+                    return socket.emit('errorEvent', { type: err ? err.name : 404, code: err ? err.message : 'Max length of message is 4096 letters' });
+                }
                 if (err || !findedRoom) {
                     return socket.emit('errorEvent', { type: err ? err.name : 404, code: err ? err.message : 'Room is not found!' });
                 }

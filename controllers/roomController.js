@@ -7,11 +7,18 @@ exports.createNewRoom = function (req, res, next) {
     if (!req.body.name) {
         return res.status(422).send({ error: "You must provide a name of room" });
     }
+    if (!/^[A-Za-zА-Я-а-я0-9_]+$/.test(req.body.name)) {
+        return res.status(422).send({ error: "Only letters and numbers (and _ ) are allowed in name" });
+    }
+    if (req.body.name.length > 10) {
+        return res.status(422).send({ error: "Max length of name 10 characters" });
+    }
+
     Room.findOne({ name: req.body.name }, function (err, existingRoom) {
         if (err) { return next(err); }
 
         if (existingRoom) {
-            return res.status(422).send({ error: 'Room with this name is already exists!' });
+            return res.status(422).send({ error: `Room with name "${req.body.name}" is already exists` });
         }
 
         const room = new Room({
@@ -31,7 +38,7 @@ exports.getAllRooms = function (req, res, next) {
         if (err) { return next(err); }
         const promises = rooms.map(({ _id, _owner, name }) => {
             return new Promise((resolve, reject) => {
-                let changedRoom = { _id, name };
+                let changedRoom = { _id, _owner, name };
                 User.findOne({ _id: _owner }, { name: 1 }, (err, findedUser) => {
                     if (findedUser) {
                         changedRoom._owner = findedUser;
@@ -55,7 +62,7 @@ exports.getRoom = function (req, res, next) {
         if (!room) {
             return res.status(403).send('Room is not found!');
         }
-        let changedRoom = { _id: room._id, name: room.name };
+        let changedRoom = room;
         User.findOne({ _id: room._owner }, { name: 1 }, (err, findedUser) => {
             if (findedUser) {
                 changedRoom._owner = findedUser;
