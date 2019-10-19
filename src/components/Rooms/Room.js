@@ -1,10 +1,11 @@
-import React, { useEffect, useContext } from 'react';
+import React, { useEffect, useContext, useState } from 'react';
 import { connect } from 'react-redux';
 import requireAuth from 'components/requireAuth';
 import { ToastsStore } from 'react-toasts';
 import { reset, reduxForm, Field } from 'redux-form';
 import { compose } from 'redux';
 import { Link } from 'react-router-dom';
+import './style.scss'
 
 import * as actionTypes from 'actions/types';
 import SocketContext from 'contexts/SocketContext';
@@ -13,7 +14,9 @@ const useMountEffect = (fun) => useEffect(fun, []);
 
 const Room = (props) => {
     let endOfMessagesRef = React.createRef();
+    let messageListRef = React.createRef();
     const socket = useContext(SocketContext);
+    const [style, setStyle] = useState({ resize: 'none', overflow: 'hidden', height: '60px', messageListHeight: '', messageHeight: '60vh' })
 
     useMountEffect(() => {
         props.dispatch({ type: actionTypes.FETCH_MESSAGES_REQUEST, payload: props.match.params.id });
@@ -45,6 +48,7 @@ const Room = (props) => {
         window.onunload = window.onbeforeunload = () => {
             socket.emit('leaveRoom', props.match.params.id);
         }
+        setStyle({ ...style, messageListHeight: messageListRef.current.clientHeight + 58 });
         return () => {
             props.dispatch({ type: actionTypes.RESET_MESSAGES_REQUEST, payload: {} });
             socket.emit('leaveRoom', props.match.params.id);
@@ -53,11 +57,19 @@ const Room = (props) => {
     });
 
     useEffect(() => {
-        scrollToBottom();
+        endOfMessagesRef.current.scrollIntoView({ behavior: 'smooth' });
         if (!props.rooms.length) {
             props.dispatch({ type: actionTypes.FETCH_ROOM_REQUEST, payload: props.match.params.id });
         }
     });
+
+    function handleKeyUp(e) {
+
+        e.target.style.height = 'inherit';
+        e.target.style.height = `${Math.min(e.target.scrollHeight, 250)}px`;
+        setStyle({ ...style, height: e.target.style.height, messageHeight: style.messageListHeight - Math.min(e.target.scrollHeight, 250) });
+        e.target.style.height === '250px' ? e.target.style.overflow = 'auto' : e.target.style.overflow = 'hidden';
+    }
 
     function onSubmit(formValues) {
         const message = {
@@ -65,6 +77,7 @@ const Room = (props) => {
             content: formValues.content.replace(/(^\s+|\s+$)/g, '')
         }
         socket.emit('message', message);
+        setStyle({ ...style, height: '60px', messageHeight: style.messageListHeight-60 });
         props.dispatch(reset('chatForm'));
     }
 
@@ -80,7 +93,7 @@ const Room = (props) => {
         if (props.messages.length) {
             return props.messages.slice(0).reverse().map(message => {
                 return (
-                    <li key={message._id} className="">
+                    <li key={message._id} className="chat__message">
                         <div>
                             User
                             <span style={{ fontWeight: "bold" }}> {message._user.name} </span>
@@ -98,10 +111,6 @@ const Room = (props) => {
         }
     }
 
-    function scrollToBottom() {
-        endOfMessagesRef.scrollIntoView({ behavior: 'smooth' });
-    }
-
     function renderListOfUsers() {
         if (props.users.length) {
             return props.users.map((user) => {
@@ -111,7 +120,7 @@ const Room = (props) => {
     }
 
     return (
-        <div className="container">
+        <div className="container" >
             <div className="row">
                 <div className="col">
                     <div className="d-flex justify-content-between mb-1">
@@ -123,19 +132,17 @@ const Room = (props) => {
                     </ul>
                 </div>
             </div>
-            <div className="row">
-                <div className="col">
-                    <ul style={{ maxHeight: "55vh", overflowY: "scroll" }}>
-                        {renderMessageList()}
-                        <li ref={(el) => { endOfMessagesRef = el }}></li>
-                    </ul>
-                    <form onSubmit={props.handleSubmit(onSubmit)}>
-                        <div className="d-flex">
-                            <Field name="content" component="textarea" className="form-control" placeholder="Enter your message" style={{ resize: 'none' }} />
-                            <button type="submit" className="btn btn-primary">Send</button>
-                        </div>
-                    </form>
-                </div>
+            <div className="chat">
+                <ul className="message__list" ref={messageListRef} style={{ height: style.messageHeight }}>
+                    {renderMessageList()}
+                    <li ref={endOfMessagesRef}></li>
+                </ul>
+                <form className="chat__form" onSubmit={props.handleSubmit(onSubmit)} style={{ marginBottom: `-${style.height}` }}>
+                    <div className="d-flex">
+                        <Field name="content" component="textarea" className="form-control" placeholder="Enter your message" style={style} onKeyUp={handleKeyUp} />
+                        <button type="submit" className="btn btn-primary">Send</button>
+                    </div>
+                </form>
             </div>
         </div>
     );

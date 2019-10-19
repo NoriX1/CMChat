@@ -1,0 +1,13 @@
+.chat{
+    position: relative;
+}
+.message__list{
+    overflow-y: scroll;
+
+}
+.chat__form{
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}

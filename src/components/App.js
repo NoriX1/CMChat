@@ -18,7 +18,7 @@ const App = (props) => {
         }
     });
     return (
-        <div>
+        <div className="content">
             <SocketContext.Provider value={socket}>
                 {props.children}
             </SocketContext.Provider>
