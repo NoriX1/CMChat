@@ -90,7 +90,7 @@ const Room = (props) => {
                             </span>
                         </div>
                         <div className="alert alert-secondary p-2">
-                            {message.content}
+                            {message.content.split(/(?:\r\n|\r|\n)/g).map((line, index) => <div key={index}>{line}</div>)}
                         </div>
                     </li>
                 )
