@@ -67,7 +67,7 @@ exports.getRoom = function (req, res, next) {
         if (!room) {
             return res.status(403).send('Room is not found!');
         }
-        let changedRoom = room;
+        let changedRoom = { ...room._doc };
         User.findOne({ _id: room._owner }, { name: 1 }, (err, findedUser) => {
             if (findedUser) {
                 changedRoom._owner = findedUser;
@@ -76,6 +76,7 @@ exports.getRoom = function (req, res, next) {
                 changedRoom.countOfUsers = partyes.length;
                 res.send(changedRoom);
             });
+
         });
     });
 }
