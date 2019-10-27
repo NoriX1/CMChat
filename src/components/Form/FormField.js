@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default ({ input, label, type, meta: { error, touched } }) => {
+export default ({ input, label, type, style, meta: { error, touched } }) => {
 
     function renderError() {
         if (touched && error) {
@@ -13,7 +13,7 @@ export default ({ input, label, type, meta: { error, touched } }) => {
     return (
         <div className="form-group">
             <label>{label}</label>
-            <input className="form-control" {...input} type={type} autoComplete="off" />
+            <input className="form-control" style={style} {...input} type={type} autoComplete="off" />
             {renderError()}
         </div>
     );
