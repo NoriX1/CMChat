@@ -5,7 +5,6 @@ import Modal from 'components/Modal/Modal'
 import { Link } from 'react-router-dom';
 import Form from 'components/Form/Form';
 import fields from 'components/Form/formFields';
-import { ToastsStore } from 'react-toasts';
 
 export default (ChildComponent) => {
     const ComposedComponent = (props) => {
@@ -23,12 +22,20 @@ export default (ChildComponent) => {
 
         function handleSubmit(formValues) {
             return new Promise((resolve, reject) => {
-                props.dispatch({ type: actionTypes.EDIT_USER_REQUEST, payload: { formValues: formValues, resolve, reject } });
+                props.dispatch(
+                    {
+                        type: actionTypes.CHECK_ROOM_PASSWORD_REQUEST,
+                        payload: {
+                            formValues: { _id: props.currentRoom._id, ...formValues },
+                            resolve,
+                            reject
+                        }
+                    });
             }).then(() => {
-                props.history.push('/rooms');
+                setDisplayComponent(true);
             });
         }
-    
+
         function renderButtons() {
             return (
                 <div className="d-flex justify-content-between">

@@ -70,7 +70,7 @@ function validate(values, props) {
 }
 
 function mapStateToProps(state) {
-    return { isPrivate: state.form.createRoomForm ? state.form.createRoomForm.values.private : false };
+    return { isPrivate: (state.form.createRoomForm && state.form.createRoomForm.values) ? state.form.createRoomForm.values.private : false };
 }
 
 export default compose(

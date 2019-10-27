@@ -12,6 +12,6 @@ export default {
         { label: 'Change nickname', name: 'name', type: 'text' }
     ],
     privateRoom: [
-        { label: 'Please, enter a password of this room', name: 'password', type: 'password'}
+        { label: 'Please, enter a password of this room', name: 'roompassword', type: 'password'}
     ]
 };
