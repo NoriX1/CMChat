@@ -13,6 +13,9 @@ exports.createNewRoom = function (req, res, next) {
     if (req.body.name.length > 10) {
         return res.status(422).send({ error: "Max length of name is 10 characters" });
     }
+    if (req.body.private && !req.body.password) {
+        return res.status(422).send({ error: "Private room should have a password!" });
+    }
 
     Room.findOne({ name: req.body.name }, function (err, existingRoom) {
         if (err) { return next(err); }
@@ -23,7 +26,9 @@ exports.createNewRoom = function (req, res, next) {
 
         const room = new Room({
             name: req.body.name,
-            _owner: req.user
+            _owner: req.user,
+            isPrivate: req.body.private,
+            password: req.body.password || ''
         });
 
         room.save((err, createdRoom) => {
@@ -36,9 +41,9 @@ exports.createNewRoom = function (req, res, next) {
 exports.getAllRooms = function (req, res, next) {
     Room.find((err, rooms) => {
         if (err) { return next(err); }
-        const promises = rooms.map(({ _id, _owner, name }) => {
+        const promises = rooms.map(({ _id, _owner, name, isPrivate }) => {
             return new Promise((resolve, reject) => {
-                let changedRoom = { _id, _owner, name };
+                let changedRoom = { _id, _owner, name, isPrivate };
                 User.findOne({ _id: _owner }, { name: 1 }, (err, findedUser) => {
                     if (findedUser) {
                         changedRoom._owner = findedUser;
@@ -57,7 +62,7 @@ exports.getAllRooms = function (req, res, next) {
 }
 
 exports.getRoom = function (req, res, next) {
-    Room.findOne({ _id: req.params.id }, (err, room) => {
+    Room.findOne({ _id: req.params.id }, { password: 0 }, (err, room) => {
         if (err) { return next(err); }
         if (!room) {
             return res.status(403).send('Room is not found!');
@@ -124,6 +129,19 @@ exports.getAllUsersOfRoom = function (req, res, next) {
             Promise.all(promises).then((userList) => {
                 res.send(userList);
             });
+        });
+    });
+}
+
+exports.checkPassword = function (req, res, next) {
+    Room.findOne({ _id: req.body._id }, (err, room) => {
+        if (err) return next(err);
+        if (!room) return res.status(403).send('Room is not found!');
+        room.comparePassword(req.body.roompassword, function (err, isMatch) {
+            if (err) return next(err);
+            if (!isMatch) return res.status(401).send({ error: 'Password is incorrect!' });
+            res.send({ message: 'Password is correct!' });
+
         });
     });
 }
