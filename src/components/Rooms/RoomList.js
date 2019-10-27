@@ -30,7 +30,10 @@ const RoomList = (props) => {
                 return (
                     <li className="mb-1" key={room._id}>
                         <Link to={`/room/${room._id}`} className="list-group-item list-group-item-dark list-group-item-action d-flex justify-content-between align-items-center">
-                            <div>{`${room.name}, ${room.countOfUsers || 0} user(s) joined`}</div>
+                            <div>
+                                <span style={{verticalAlign: 'middle'}}>{`${room.name}, ${room.countOfUsers || 0} user(s) joined`}</span>
+                                {room.isPrivate ? <div className="room__private"></div> : <div></div>}
+                            </div>
                             <object>{renderOwnerOrDelete(room)}</object>
                         </Link>
                     </li>
@@ -53,7 +56,7 @@ const RoomList = (props) => {
 
     return (
         <div className="container text-center">
-            <ul className="list-group mb-3" style={{maxHeight: '70vh', overflowY: 'auto'}}>{renderRoomsList()}</ul>
+            <ul className="list-group mb-3" style={{ maxHeight: '70vh', overflowY: 'auto' }}>{renderRoomsList()}</ul>
             <Link className="btn btn-primary" to="/rooms/new">Create new</Link>
         </div>
     )

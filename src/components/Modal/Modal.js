@@ -6,7 +6,7 @@ import './style.scss'
 const Modal = props => {
     return ReactDOM.createPortal(
         <div className="modal" onClick={props.onDismiss}>
-            <div className="modal-dialog"  onClick={(e) => e.stopPropagation()}>
+            <div className="modal-dialog" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-content text-dark">
                     <div className="modal-header">
                         <h5 className="modal-title">{props.title}</h5>
@@ -15,7 +15,7 @@ const Modal = props => {
                         </button>
                     </div>
                     <div className="modal-body">
-                        <p>{props.content}</p>
+                        {props.content}
                     </div>
                     <div className="modal-footer">{props.actions}</div>
                 </div>

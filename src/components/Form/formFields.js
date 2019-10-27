@@ -8,10 +8,10 @@ export default {
         { label: 'Enter your email', name: 'email', type: 'text' },
         { label: 'Enter your password', name: 'signinpassword', type: 'password' }
     ],
-    newRoom: [
-        { label: 'Enter the name of room', name: 'name', type: 'text' }
-    ],
     editUser: [
         { label: 'Change nickname', name: 'name', type: 'text' }
+    ],
+    privateRoom: [
+        { label: 'Please, enter a password of this room', name: 'roompassword', type: 'password'}
     ]
 };

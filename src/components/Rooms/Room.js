@@ -9,6 +9,7 @@ import './style.scss'
 
 import * as actionTypes from 'actions/types';
 import SocketContext from 'contexts/SocketContext';
+import requirePassword from 'components/requirePassword';
 
 const useMountEffect = (fun) => useEffect(fun, []);
 
@@ -174,5 +175,6 @@ function validate(values) {
 export default compose(
     connect(mapStateToProps),
     requireAuth,
+    requirePassword,
     reduxForm({ form: 'chatForm', validate })
 )(Room);
