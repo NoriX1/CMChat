@@ -115,10 +115,15 @@ function* deleteRoom(action) {
 
 function* fetchMessages(action) {
     try {
-        const response = yield call(backendApi, 'get', `/rooms/${action.payload}/messages`, {}, localStorage.getItem('token'));
+        const response = yield call(backendApi, 'post', `/rooms/messages`, action.payload.formValues, localStorage.getItem('token'));
         yield put({ type: actionTypes.FETCH_MESSAGES, payload: response.data });
+        action.payload.resolve(response.data);
     } catch (e) {
-        ToastsStore.error(`${e.response.status}:${e.response.statusText}`, NOTIFICATIONS_DURATION);
+        if (e.response.data) {
+            action.payload.reject(new SubmissionError({ _error: e.response.data.error }));
+        } else {
+            ToastsStore.error(`${e.response.status}:${e.response.statusText}`, NOTIFICATIONS_DURATION);
+        }
     }
 }
 
@@ -153,15 +158,6 @@ function* editUser(action) {
     }
 }
 
-function* checkRoomPassword(action) {
-    try {
-        const response = yield call(backendApi, 'post', '/rooms/checkpass', action.payload.formValues, localStorage.getItem('token'));
-        action.payload.resolve(response.data);
-    } catch (e) {
-        action.payload.reject(new SubmissionError({ _error: e.response.data.error }));
-    }
-}
-
 function* mySaga() {
     yield takeLatest(actionTypes.SIGN_UP_REQUEST, signUp);
     yield takeLatest(actionTypes.SIGN_IN_REQUEST, signIn);
@@ -178,7 +174,6 @@ function* mySaga() {
     yield takeLatest(actionTypes.FETCH_USERS_REQUEST, fetchUsersFromRoom);
     yield takeLatest(actionTypes.RESET_USERS_REQUEST, resetUsers);
     yield takeLatest(actionTypes.EDIT_USER_REQUEST, editUser);
-    yield takeLatest(actionTypes.CHECK_ROOM_PASSWORD_REQUEST, checkRoomPassword);
 }
 
 export default mySaga;

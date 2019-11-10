@@ -20,7 +20,19 @@ const Room = (props) => {
     const [style, setStyle] = useState({ resize: 'none', overflow: 'hidden', height: '60px', messageListHeight: '', messageHeight: '60vh' })
 
     useMountEffect(() => {
-        props.dispatch({ type: actionTypes.FETCH_MESSAGES_REQUEST, payload: props.match.params.id });
+        if (!props.currentRoom.isPrivate) {
+            new Promise((resolve, reject) => {
+                props.dispatch(
+                    {
+                        type: actionTypes.FETCH_MESSAGES_REQUEST,
+                        payload: {
+                            formValues: { _id: props.currentRoom._id },
+                            resolve,
+                            reject
+                        }
+                    });
+            });
+        }
         props.dispatch({ type: actionTypes.FETCH_USERS_REQUEST, payload: props.match.params.id });
         socket.emit('joinRoom', props.match.params.id);
         socket.on('message', (message) => {
@@ -78,7 +90,7 @@ const Room = (props) => {
             content: formValues.content.replace(/(^\s+|\s+$)/g, '')
         }
         socket.emit('message', message);
-        setStyle({ ...style, height: '60px', messageHeight: style.messageListHeight-60 });
+        setStyle({ ...style, height: '60px', messageHeight: style.messageListHeight - 60 });
         props.dispatch(reset('chatForm'));
     }
 
@@ -149,12 +161,13 @@ const Room = (props) => {
     );
 }
 
-function mapStateToProps(state) {
+function mapStateToProps(state, props) {
     return {
         currentUser: state.auth.currentUser,
         messages: Object.values(state.messages),
         rooms: Object.values(state.rooms),
-        users: Object.values(state.users)
+        users: Object.values(state.users),
+        currentRoom: state.rooms[props.match.params.id]
     };
 }
 

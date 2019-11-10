@@ -9,7 +9,7 @@ import fields from 'components/Form/formFields';
 export default (ChildComponent) => {
     const ComposedComponent = (props) => {
 
-        const [displayComponent, setDisplayComponent] = useState(false);
+        const [displayComponent, setDisplayComponent] = useState(undefined);
 
         useEffect(() => {
             if (!props.currentRoom) {
@@ -24,7 +24,7 @@ export default (ChildComponent) => {
             return new Promise((resolve, reject) => {
                 props.dispatch(
                     {
-                        type: actionTypes.CHECK_ROOM_PASSWORD_REQUEST,
+                        type: actionTypes.FETCH_MESSAGES_REQUEST,
                         payload: {
                             formValues: { _id: props.currentRoom._id, ...formValues },
                             resolve,
@@ -46,6 +46,9 @@ export default (ChildComponent) => {
         }
 
         function renderComponent() {
+            if(!props.currentRoom){
+                return <div></div>;
+            }
             if (displayComponent) {
                 return <ChildComponent {...props} />;
             }
