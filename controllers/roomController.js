@@ -93,21 +93,32 @@ exports.deleteRoom = function (req, res, next) {
     });
 }
 
-exports.getAllMessagesFromRoom = function (req, res, next) {
-    Message.find({ _room: req.params.id }, (err, messages) => {
+exports.fetchAllMessagesFromRoom = function (req, res, next) {
+    Room.findOne({ _id: req.body._id }, (err, findedRoom) => {
         if (err) { return next(err); }
-        const promises = messages.map((message) => {
-            return User.findOne({ _id: message._user }, { password: 0 }).then((findedUser) => {
-                if (findedUser) {
-                    message._user = findedUser;
-                }
-                return message;
+        if (!findedRoom) { return res.status(403).send('Room is not found!'); }
+        if (findedRoom.isPrivate) {
+            if (!req.body.roompassword) { return res.status(401).send({ error: 'You must provide a password!' }); }
+            findedRoom.comparePassword(req.body.roompassword, function (err, isMatch) {
+                if (err) return next(err);
+                if (!isMatch) return res.status(401).send({ error: 'Password is incorrect!' });
             });
-        });
-        Promise.all(promises).then((messagesWithUser) => {
-            res.send(messagesWithUser);
-        });
-    }).sort({ dateSent: -1 }).limit(50);
+        }
+        Message.find({ _room: req.body._id }, (err, messages) => {
+            if (err) { return next(err); }
+            const promises = messages.map((message) => {
+                return User.findOne({ _id: message._user }, { password: 0 }).then((findedUser) => {
+                    if (findedUser) {
+                        message._user = findedUser;
+                    }
+                    return message;
+                });
+            });
+            Promise.all(promises).then((messagesWithUser) => {
+                res.send(messagesWithUser);
+            });
+        }).sort({ dateSent: -1 }).limit(50);
+    });
 }
 
 exports.getAllUsersOfRoom = function (req, res, next) {
@@ -130,19 +141,6 @@ exports.getAllUsersOfRoom = function (req, res, next) {
             Promise.all(promises).then((userList) => {
                 res.send(userList);
             });
-        });
-    });
-}
-
-exports.checkPassword = function (req, res, next) {
-    Room.findOne({ _id: req.body._id }, (err, room) => {
-        if (err) return next(err);
-        if (!room) return res.status(403).send('Room is not found!');
-        room.comparePassword(req.body.roompassword, function (err, isMatch) {
-            if (err) return next(err);
-            if (!isMatch) return res.status(401).send({ error: 'Password is incorrect!' });
-            res.send({ message: 'Password is correct!' });
-
         });
     });
 }
