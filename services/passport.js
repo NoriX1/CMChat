@@ -26,10 +26,15 @@ const jwtOptions = {
     secretOrKey: keys.secret
 };
 const jwtLogin = new JwtStrategy(jwtOptions, function (payload, done) {
+    const exp = new Date().setDate(new Date(payload.iat).getDate() + 1);
     User.findById(payload.sub, function (err, user) {
         if (err) { return done(err, false); }
         if (user) {
-            done(null, user);
+            if (new Date().getTime() > exp) {
+                done(null, false);
+            } else {
+                done(null, user);
+            }
         } else {
             done(null, false);
         }

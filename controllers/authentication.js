@@ -96,3 +96,7 @@ exports.editUser = function (req, res, next) {
         });
     });
 }
+
+exports.checkAuth = function (req, res, next) {
+    res.send({ message: 'correct' });
+}
