@@ -63,8 +63,8 @@ const Room = (props) => {
         }
         setStyle({ ...style, messageListHeight: messageListRef.current.clientHeight + 58 });
         return () => {
-            props.dispatch({ type: actionTypes.RESET_MESSAGES_REQUEST, payload: {} });
             socket.emit('leaveRoom', props.match.params.id);
+            props.dispatch({ type: actionTypes.RESET_MESSAGES_REQUEST, payload: {} });
             socket.off();
         }
     });

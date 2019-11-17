@@ -67,7 +67,9 @@ function* fetchUser() {
 
         yield put({ type: actionTypes.CHANGE_USER, payload: user.data });
     } catch (e) {
-        ToastsStore.error(e.response.data, NOTIFICATIONS_DURATION);
+        if (e.response.status !== 401) {
+            ToastsStore.error(e.response.data, NOTIFICATIONS_DURATION);
+        }
     }
 }
 
@@ -119,7 +121,7 @@ function* fetchMessages(action) {
         yield put({ type: actionTypes.FETCH_MESSAGES, payload: response.data });
         action.payload.resolve(response.data);
     } catch (e) {
-        if (e.response.data) {
+        if (e.response.data && (e.response.status !== 401)) {
             action.payload.reject(new SubmissionError({ _error: e.response.data.error }));
         } else {
             ToastsStore.error(`${e.response.status}:${e.response.statusText}`, NOTIFICATIONS_DURATION);
@@ -158,6 +160,15 @@ function* editUser(action) {
     }
 }
 
+function* checkAuth(action) {
+    try {
+        yield call(backendApi, 'get', '/auth/check', null, localStorage.getItem('token'));
+        action.payload.resolve();
+    } catch (e) {
+        action.payload.reject(e.response);
+    }
+}
+
 function* mySaga() {
     yield takeLatest(actionTypes.SIGN_UP_REQUEST, signUp);
     yield takeLatest(actionTypes.SIGN_IN_REQUEST, signIn);
@@ -174,6 +185,7 @@ function* mySaga() {
     yield takeLatest(actionTypes.FETCH_USERS_REQUEST, fetchUsersFromRoom);
     yield takeLatest(actionTypes.RESET_USERS_REQUEST, resetUsers);
     yield takeLatest(actionTypes.EDIT_USER_REQUEST, editUser);
+    yield takeLatest(actionTypes.CHECK_AUTH_REQUEST, checkAuth);
 }
 
 export default mySaga;
