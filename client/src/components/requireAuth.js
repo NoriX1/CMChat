@@ -6,47 +6,47 @@ import * as actionTypes from 'actions/types';
 
 export default (ChildComponent) => {
 
-    const useMountEffect = (fun) => useEffect(fun, []);
+  const useMountEffect = (fun) => useEffect(fun, []);
 
-    const ComposedComponent = (props) => {
+  const ComposedComponent = (props) => {
 
-        const socket = useContext(SocketContext);
-        const [displayChild, setDisplayChild] = useState(false);
+    const socket = useContext(SocketContext);
+    const [displayChild, setDisplayChild] = useState(false);
 
-        useMountEffect(() => {
-            shouldNavigateAway();
+    useMountEffect(() => {
+      shouldNavigateAway();
+    });
+
+    function shouldNavigateAway() {
+      new Promise((resolve, reject) => {
+        props.dispatch({
+          type: actionTypes.CHECK_AUTH_REQUEST, payload: {
+            resolve,
+            reject
+          }
         });
-
-        function shouldNavigateAway() {
-            new Promise((resolve, reject) => {
-                props.dispatch({
-                    type: actionTypes.CHECK_AUTH_REQUEST, payload: {
-                        resolve,
-                        reject
-                    }
-                });
-            }).then(() => { setDisplayChild(true) }, (reason) => {
-                ToastsStore.warning(`${reason.data}: token invalid or expired`, 5000);
-                return new Promise((resolve, reject) => {
-                    props.dispatch({ type: actionTypes.SIGN_OUT_REQUEST, payload: { resolve, reject } });
-                }).then(() => { socket.disconnect() });
-            });
-        }
-
-        function renderComponent() {
-            if (!displayChild) {
-                return <div></div>
-            } else {
-                return <ChildComponent {...props} />
-            }
-        }
-
-        return renderComponent();
+      }).then(() => { setDisplayChild(true) }, (reason) => {
+        ToastsStore.warning(`${reason.data}: token invalid or expired`, 5000);
+        return new Promise((resolve, reject) => {
+          props.dispatch({ type: actionTypes.SIGN_OUT_REQUEST, payload: { resolve, reject } });
+        }).then(() => { socket.disconnect() });
+      });
     }
 
-    function mapStateToProps(state) {
-        return { auth: state.auth.authenticated };
+    function renderComponent() {
+      if (!displayChild) {
+        return <div></div>
+      } else {
+        return <ChildComponent {...props} />
+      }
     }
 
-    return connect(mapStateToProps)(ComposedComponent);
+    return renderComponent();
+  }
+
+  function mapStateToProps(state) {
+    return { auth: state.auth.authenticated };
+  }
+
+  return connect(mapStateToProps)(ComposedComponent);
 };

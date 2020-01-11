@@ -11,11 +11,11 @@ const socketIO = require('socket.io');
 
 // DB Setup
 mongoose.connect(keys.mongoURI, { useNewUrlParser: true, useCreateIndex: true }, (err) => {
-    if (err) {
-        console.warn(err);
-        return;
-    }
-    console.log('Database connected successfully');
+  if (err) {
+    console.warn(err);
+    return;
+  }
+  console.log('Database connected successfully');
 })
 
 //App Setup

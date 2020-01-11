@@ -3,36 +3,36 @@ const Schema = mongoose.Schema;
 const bcrypt = require('bcrypt-nodejs');
 
 const userSchema = new Schema({
-    name: String,
-    email: { type: String, unique: true, lowercase: true },
-    password: String,
-    googleID: String
+  name: String,
+  email: { type: String, unique: true, lowercase: true },
+  password: String,
+  googleID: String
 });
 
 //On save hook for encrypting the password
 userSchema.pre('save', function (next) {
-    const user = this;
+  const user = this;
 
-    if (!user.password) { return next(); } //In case of auth with google password is absent
+  if (!user.password) { return next(); } //In case of auth with google password is absent
 
-    bcrypt.genSalt(10, function (err, salt) {
-        if (err) { return next(err); }
+  bcrypt.genSalt(10, function (err, salt) {
+    if (err) { return next(err); }
 
-        bcrypt.hash(user.password, salt, null, function (err, hash) {
-            if (err) { return next(err); }
+    bcrypt.hash(user.password, salt, null, function (err, hash) {
+      if (err) { return next(err); }
 
-            user.password = hash;
-            next();
-        });
+      user.password = hash;
+      next();
     });
+  });
 });
 
 userSchema.methods.comparePassword = function (candidatePassword, callback) {
-    bcrypt.compare(candidatePassword, this.password, function (err, isMatch) {
-        if (err) { return callback(err); }
+  bcrypt.compare(candidatePassword, this.password, function (err, isMatch) {
+    if (err) { return callback(err); }
 
-        callback(null, isMatch); 
-    });
+    callback(null, isMatch);
+  });
 }
 
 const ModelClass = mongoose.model('user', userSchema);

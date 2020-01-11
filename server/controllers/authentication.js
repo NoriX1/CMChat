@@ -5,98 +5,98 @@ const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@(([[0-9]
 
 
 function tokenForUser(user) {
-    const timestamp = new Date().getTime();
-    // sub --> subject; iat --> issued at time
-    return jwt.encode({ sub: user.id, iat: timestamp }, keys.secret);
+  const timestamp = new Date().getTime();
+  // sub --> subject; iat --> issued at time
+  return jwt.encode({ sub: user.id, iat: timestamp }, keys.secret);
 }
 
 exports.signup = function (req, res, next) {
-    const { name, email, password } = req.body;
+  const { name, email, password } = req.body;
 
-    if (!name || !email || !password) {
-        return res.status(422).send({ error: 'You must provide all required fields!' });
-    }
-    if (!/^[A-Za-zА-Я-а-я0-9_]+$/.test(name)) {
-        return res.status(422).send({ error: "Only letters and numbers (and _ ) are allowed in name" });
-    }
-    if (name.length > 10) {
-        return res.status(422).send({ error: "Max length of name is 10 characters" });
+  if (!name || !email || !password) {
+    return res.status(422).send({ error: 'You must provide all required fields!' });
+  }
+  if (!/^[A-Za-zА-Я-а-я0-9_]+$/.test(name)) {
+    return res.status(422).send({ error: "Only letters and numbers (and _ ) are allowed in name" });
+  }
+  if (name.length > 10) {
+    return res.status(422).send({ error: "Max length of name is 10 characters" });
+  }
+
+  if (!re.test(email)) {
+    return res.status(422).send({ error: "Email is invalid" });
+  }
+
+  User.findOne({ email: email }, (err, existingUser) => {
+    if (err) { return next(err); }
+
+    if (existingUser) {
+      return res.status(422).send({ error: 'Email is in use' });
     }
 
-    if (!re.test(email)) {
-        return res.status(422).send({ error: "Email is invalid" });
-    }
+    User.findOne({ name: name }, (err, existingUser) => {
+      if (err) { return next(err); }
 
-    User.findOne({ email: email }, (err, existingUser) => {
+      if (existingUser) {
+        return res.status(422).send({ error: `Name "${name}" is already is in use` });
+      }
+
+      const user = new User({
+        name: name,
+        email: email,
+        password: password
+      });
+
+      user.save((err) => {
         if (err) { return next(err); }
-
-        if (existingUser) {
-            return res.status(422).send({ error: 'Email is in use' });
-        }
-
-        User.findOne({ name: name }, (err, existingUser) => {
-            if (err) { return next(err); }
-
-            if (existingUser) {
-                return res.status(422).send({ error: `Name "${name}" is already is in use` });
-            }
-
-            const user = new User({
-                name: name,
-                email: email,
-                password: password
-            });
-
-            user.save((err) => {
-                if (err) { return next(err); }
-                res.json({ token: tokenForUser(user) });
-            });
-        });
+        res.json({ token: tokenForUser(user) });
+      });
     });
+  });
 }
 
 exports.signin = function (req, res, next) {
-    //Users has already had their email and password auth`d
-    //We just need to give them a token
-    res.send({ token: tokenForUser(req.user) });
+  //Users has already had their email and password auth`d
+  //We just need to give them a token
+  res.send({ token: tokenForUser(req.user) });
 
 }
 
 exports.signInGoogle = function (req, res, next) {
-    res.redirect(`${keys.clientURI}/google/` + tokenForUser(req.user));
+  res.redirect(`${keys.clientURI}/google/` + tokenForUser(req.user));
 }
 
 exports.sendUser = function (req, res, next) {
-    const user = new User({
-        _id: req.user.id,
-        name: req.user.name,
-        email: req.user.email
-    });
-    res.send(user);
+  const user = new User({
+    _id: req.user.id,
+    name: req.user.name,
+    email: req.user.email
+  });
+  res.send(user);
 }
 
 exports.editUser = function (req, res, next) {
-    if (!req.body.name) {
-        return res.status(422).send({ error: "You must provide a name of user" });
+  if (!req.body.name) {
+    return res.status(422).send({ error: "You must provide a name of user" });
+  }
+  if (!/^[A-Za-zА-Я-а-я0-9_]+$/.test(req.body.name)) {
+    return res.status(422).send({ error: "Only letters and numbers (and _ ) are allowed in name" });
+  }
+  if (req.body.name.length > 10) {
+    return res.status(422).send({ error: "Max length of name is 10 characters" });
+  }
+  User.findOne({ name: req.body.name }, (err, findedUser) => {
+    if (err) { return next(err) };
+    if (findedUser) {
+      return res.status(422).send({ error: `User with name "${req.body.name}" is already exists` });
     }
-    if (!/^[A-Za-zА-Я-а-я0-9_]+$/.test(req.body.name)) {
-        return res.status(422).send({ error: "Only letters and numbers (and _ ) are allowed in name" });
-    }
-    if (req.body.name.length > 10) {
-        return res.status(422).send({ error: "Max length of name is 10 characters" });
-    }
-    User.findOne({ name: req.body.name }, (err, findedUser) => {
-        if (err) { return next(err) };
-        if (findedUser) {
-            return res.status(422).send({ error: `User with name "${req.body.name}" is already exists` });
-        }
-        User.findOneAndUpdate({ _id: req.user.id }, { name: req.body.name }, { new: true, projection: { password: 0 } }, (err, editedUser) => {
-            if (err) { return next(err) };
-            res.send(editedUser);
-        });
+    User.findOneAndUpdate({ _id: req.user.id }, { name: req.body.name }, { new: true, projection: { password: 0 } }, (err, editedUser) => {
+      if (err) { return next(err) };
+      res.send(editedUser);
     });
+  });
 }
 
 exports.checkAuth = function (req, res, next) {
-    res.send({ message: 'correct' });
+  res.send({ message: 'correct' });
 }
