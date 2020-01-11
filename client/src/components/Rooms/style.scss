@@ -1,0 +1,23 @@
+.chat{
+    position: relative;
+}
+.message__list{
+    overflow-y: scroll;
+
+}
+.chat__form{
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+.room__private{
+    content: "";
+    width: 1.3rem;
+    height: 1.3rem;
+    background: url('/lock.png') center center no-repeat;
+    background-size: contain;
+    display: inline-block;
+    margin-left: 1rem;
+    vertical-align: middle;
+}
