@@ -17,7 +17,7 @@ services:
       - ./client:/app
     environment: 
       - REACT_APP_SOCKET_URI=http://localhost:3000
-      - REACT_APP_BACKEND_URI=api
+      - REACT_APP_BACKEND_URI=/api
   api:
     build: 
       dockerfile: Dockerfile.dev
