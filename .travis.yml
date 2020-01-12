@@ -16,8 +16,10 @@ before_install:
 
 #after_success:
 script:
-  - docker build -t $DOCKER_ID/cmchat-client ./client
+  - docker build -t $DOCKER_ID/cmchat-client ./client;
   - docker tag $DOCKER_ID/cmchat-client registry.heroku.com/$HEROKU_APP_CLIENT/web;
+  - docker build -t $DOCKER_ID/cmchat-server ./server;
+  - docker tag $DOCKER_ID/cmchat-server registry.heroku.com/$HEROKU_APP_SERVER/web;
 
 deploy:
   provider: script
@@ -25,5 +27,7 @@ deploy:
     #docker push $DOCKER_ID/cmchat-client;
     docker push registry.heroku.com/$HEROKU_APP_CLIENT/web;
     heroku container:release web --app $HEROKU_APP_CLIENT;
+    docker push registry.heroku.com/$HEROKU_APP_SERVER/web;
+    heroku container:release web --app $HEROKU_APP_SERVER;
   on:
-    branch: feature-docker
+    branch: master
