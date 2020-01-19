@@ -1,0 +1,30 @@
+version: '3'
+services:
+  nginx:
+    restart: always
+    build: 
+      dockerfile: Dockerfile.dev
+      context: ./nginx
+    ports: 
+      - "3000:80"
+      - "3090:3090"
+  client:
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./client
+    volumes:
+      - /app/node_modules
+      - ./client:/app
+    environment: 
+      - REACT_APP_SOCKET_URI=http://localhost:3000
+      - REACT_APP_BACKEND_URI=/api
+  api:
+    build: 
+      dockerfile: Dockerfile.dev
+      context: ./server
+    volumes: 
+      - /app/node_modules
+      - ./server:/app
+    environment: 
+      - CLIENT_URI=client
+    env_file: .env

@@ -3,11 +3,11 @@ import { ToastsContainer, ToastsStore } from 'react-toasts';
 
 const Toasts = () => {
 
-    return (
-        <div>
-            <ToastsContainer store={ToastsStore} />
-        </div>
-    );
+  return (
+    <div>
+      <ToastsContainer store={ToastsStore} />
+    </div>
+  );
 
 }
 

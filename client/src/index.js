@@ -2,7 +2,7 @@ import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Router, Route } from 'react-router-dom';
-import { createStore,  applyMiddleware } from 'redux';
+import { createStore, applyMiddleware } from 'redux';
 import { Provider } from 'react-redux';
 import createSagaMiddleware from 'redux-saga';
 
@@ -23,26 +23,26 @@ import EditUser from 'components/Users/EditUser';
 
 const sagaMiddleware = createSagaMiddleware();
 const store = createStore(reducers, {
-    auth: { authenticated: localStorage.getItem("token") }
+  auth: { authenticated: localStorage.getItem("token") }
 }, applyMiddleware(sagaMiddleware));
 
 sagaMiddleware.run(mySaga);
 
 ReactDOM.render(
-    <Provider store={store}>
-        <Router history={history}>
-            <App>
-                <Route path="/" component={Header} />
-                <Route path="/" component={Toasts} />
-                <Route exact path="/" component={Landing} />
-                <Route path="/google/:token" component={GoogleAuth} />
-                <Route path="/register" component={Registration} />
-                <Route exact path="/rooms" component={RoomList} />
-                <Route path="/rooms/new" component={CreateRoom} />
-                <Route path="/room/:id" component={Room} />
-                <Route path="/rooms/close/:id" component={CloseRoom} />
-                <Route path="/profile" component={EditUser} />
-            </App>
-        </Router>
-    </Provider>,
-    document.querySelector('#root'));
+  <Provider store={store}>
+    <Router history={history}>
+      <App>
+        <Route path="/" component={Header} />
+        <Route path="/" component={Toasts} />
+        <Route exact path="/" component={Landing} />
+        <Route path="/google/:token" component={GoogleAuth} />
+        <Route path="/register" component={Registration} />
+        <Route exact path="/rooms" component={RoomList} />
+        <Route path="/rooms/new" component={CreateRoom} />
+        <Route path="/room/:id" component={Room} />
+        <Route path="/rooms/close/:id" component={CloseRoom} />
+        <Route path="/profile" component={EditUser} />
+      </App>
+    </Router>
+  </Provider>,
+  document.querySelector('#root'));

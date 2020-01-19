@@ -6,14 +6,14 @@ const auth = require('../middlewares/auth');
 const requireSignin = passport.authenticate('local', { session: false });
 
 module.exports = function (app) {
-    app.get('/', auth.requireAuth, function (req, res) {
-        res.send({ secret: 'data' });
-    })
-    app.post('/signin', requireSignin, Authentication.signin);
-    app.post('/signup', Authentication.signup);
-    app.get('/auth/check', auth.requireAuth, Authentication.checkAuth);
-    app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
-    app.get('/auth/google/callback', passport.authenticate('google', { session: false }), Authentication.signInGoogle);
-    app.get('/auth/user', auth.requireAuth, Authentication.sendUser);
-    app.put('/users/edit', auth.requireAuth, Authentication.editUser);
+  app.get('/', auth.requireAuth, function (req, res) {
+    res.send({ secret: 'data' });
+  })
+  app.post('/signin', requireSignin, Authentication.signin);
+  app.post('/signup', Authentication.signup);
+  app.get('/auth/check', auth.requireAuth, Authentication.checkAuth);
+  app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+  app.get('/auth/google/callback', passport.authenticate('google', { session: false }), Authentication.signInGoogle);
+  app.get('/auth/user', auth.requireAuth, Authentication.sendUser);
+  app.put('/users/edit', auth.requireAuth, Authentication.editUser);
 }

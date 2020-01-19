@@ -1,5 +1,7 @@
-if (process.env.NODE_ENV === 'production') {
-    module.exports = require('./prod');
-} else {
-    module.exports = require('./dev');
+module.exports = {
+  mongoURI: process.env.MONGO_URI,
+  secret: process.env.MONGO_SECRET,
+  googleClientID: process.env.GOOGLE_CLIENT_ID,
+  googleClientSecret: process.env.GOOGLE_CLIENT_SECRET,
+  clientURI: process.env.CLIENT_URI
 }

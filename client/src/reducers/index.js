@@ -6,9 +6,9 @@ import messageReducer from 'reducers/messageReducer';
 import usersReducer from 'reducers/usersReducer';
 
 export default combineReducers({
-    form: formReducer,
-    auth: authReducer,
-    rooms: roomReducer,
-    messages: messageReducer,
-    users: usersReducer
+  form: formReducer,
+  auth: authReducer,
+  rooms: roomReducer,
+  messages: messageReducer,
+  users: usersReducer
 });
