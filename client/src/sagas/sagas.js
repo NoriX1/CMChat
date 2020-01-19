@@ -169,7 +169,7 @@ function* checkAuth(action) {
   }
 }
 
-function* mySaga() {
+export default function* rootSaga() {
   yield takeLatest(actionTypes.SIGN_UP_REQUEST, signUp);
   yield takeLatest(actionTypes.SIGN_IN_REQUEST, signIn);
   yield takeLatest(actionTypes.SIGN_IN_GOOGLE_REQUEST, signInGoogle);
@@ -187,5 +187,3 @@ function* mySaga() {
   yield takeLatest(actionTypes.EDIT_USER_REQUEST, editUser);
   yield takeLatest(actionTypes.CHECK_AUTH_REQUEST, checkAuth);
 }
-
-export default mySaga;

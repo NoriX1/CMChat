@@ -9,14 +9,11 @@ import fields from 'components/Form/formFields';
 export default (ChildComponent) => {
   const ComposedComponent = (props) => {
 
-    const [displayComponent, setDisplayComponent] = useState(undefined);
+    const [displayComponent] = useState(props.currentRoom && !props.currentRoom.isPrivate);
 
     useEffect(() => {
       if (!props.currentRoom) {
         props.dispatch({ type: actionTypes.FETCH_ROOM_REQUEST, payload: props.match.params.id })
-      }
-      if (props.currentRoom && !props.currentRoom.isPrivate) {
-        setDisplayComponent(true);
       }
     });
 
@@ -31,8 +28,6 @@ export default (ChildComponent) => {
               reject
             }
           });
-      }).then(() => {
-        setDisplayComponent(true);
       });
     }
 

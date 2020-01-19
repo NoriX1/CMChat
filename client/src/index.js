@@ -2,14 +2,14 @@ import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Router, Route } from 'react-router-dom';
-import { createStore, applyMiddleware } from 'redux';
+import { createStore, compose, applyMiddleware } from 'redux';
 import { Provider } from 'react-redux';
 import createSagaMiddleware from 'redux-saga';
 
 import App from 'components/App';
 import history from './history';
 import reducers from 'reducers';
-import mySaga from 'sagas/sagas';
+import rootSaga from 'sagas/sagas';
 import Header from 'components/Header/Header';
 import Landing from 'components/Landing/Landing';
 import GoogleAuth from 'components/GoogleAuth/GoogleAuth';
@@ -21,12 +21,13 @@ import Toasts from 'components/Notifications/Toasts';
 import Room from 'components/Rooms/Room';
 import EditUser from 'components/Users/EditUser';
 
+const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 const sagaMiddleware = createSagaMiddleware();
-const store = createStore(reducers, {
-  auth: { authenticated: localStorage.getItem("token") }
-}, applyMiddleware(sagaMiddleware));
+const store = process.env.NODE_ENV === 'development' ?
+  createStore(reducers, { auth: { authenticated: localStorage.getItem("token") } }, composeEnhancers(applyMiddleware(sagaMiddleware))) :
+  createStore(reducers, { auth: { authenticated: localStorage.getItem("token") } }, applyMiddleware(sagaMiddleware))
 
-sagaMiddleware.run(mySaga);
+sagaMiddleware.run(rootSaga);
 
 ReactDOM.render(
   <Provider store={store}>
