@@ -7,16 +7,12 @@ import Form from 'components/Form/Form';
 import fields from 'components/Form/formFields';
 
 export default (ChildComponent) => {
+  const useMountEffect = (fun) => useEffect(fun, []);
   const ComposedComponent = (props) => {
-
-    const [displayComponent, setDisplayComponent] = useState(undefined);
-
-    useEffect(() => {
+    const [displayComponent, setDisplayComponent] = useState(false);
+    useMountEffect(() => {
       if (!props.currentRoom) {
-        props.dispatch({ type: actionTypes.FETCH_ROOM_REQUEST, payload: props.match.params.id })
-      }
-      if (props.currentRoom && !props.currentRoom.isPrivate) {
-        setDisplayComponent(true);
+        props.dispatch({ type: actionTypes.FETCH_ROOM_REQUEST, payload: props.match.params.id });
       }
     });
 
@@ -31,9 +27,7 @@ export default (ChildComponent) => {
               reject
             }
           });
-      }).then(() => {
-        setDisplayComponent(true);
-      });
+      }).then(() => { setDisplayComponent(true) });
     }
 
     function renderButtons() {
@@ -46,26 +40,26 @@ export default (ChildComponent) => {
     }
 
     function renderComponent() {
-      if (!props.currentRoom) {
-        return <div></div>;
-      }
-      if (displayComponent) {
+      if ((props.currentRoom && !props.currentRoom.isPrivate) || displayComponent) {
         return <ChildComponent {...props} />;
       }
-      return (
-        <Modal
-          title="Joining private room"
-          content={
-            <Form
-              title=''
-              fields={fields.privateRoom}
-              onSubmit={handleSubmit}
-              renderButtons={renderButtons}
-            />
-          }
-          onDismiss={() => { props.history.push('/rooms') }}
-        />
-      );
+      if (props.currentRoom && props.currentRoom.isPrivate) {
+        return (
+          <Modal
+            title="Joining private room"
+            content={
+              <Form
+                title=''
+                fields={fields.privateRoom}
+                onSubmit={handleSubmit}
+                renderButtons={renderButtons}
+              />
+            }
+            onDismiss={() => { props.history.push('/rooms') }}
+          />
+        );
+      }
+      return <div></div>;
     }
     return renderComponent();
   }

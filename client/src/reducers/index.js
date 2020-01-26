@@ -4,11 +4,13 @@ import authReducer from 'reducers/authReducer';
 import roomReducer from 'reducers/roomReducer';
 import messageReducer from 'reducers/messageReducer';
 import usersReducer from 'reducers/usersReducer';
+import asyncStatusReducer from 'reducers/asyncStatusReducer';
 
 export default combineReducers({
   form: formReducer,
   auth: authReducer,
   rooms: roomReducer,
   messages: messageReducer,
-  users: usersReducer
+  users: usersReducer,
+  loadStatus: asyncStatusReducer
 });

@@ -21,17 +21,11 @@ const Room = (props) => {
 
   useMountEffect(() => {
     if (!props.currentRoom.isPrivate) {
-      new Promise((resolve, reject) => {
-        props.dispatch(
-          {
-            type: actionTypes.FETCH_MESSAGES_REQUEST,
-            payload: {
-              formValues: { _id: props.currentRoom._id },
-              resolve,
-              reject
-            }
-          });
-      });
+      props.dispatch(
+        {
+          type: actionTypes.FETCH_MESSAGES_REQUEST,
+          payload: { formValues: { _id: props.currentRoom._id } }
+        });
     }
     props.dispatch({ type: actionTypes.FETCH_USERS_REQUEST, payload: props.match.params.id });
     socket.emit('joinRoom', props.match.params.id);

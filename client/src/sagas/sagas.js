@@ -1,12 +1,10 @@
 import { call, put, takeLatest } from 'redux-saga/effects';
 import backend from 'apis/backend';
 import history from '../history';
-import { ToastsStore } from 'react-toasts';
 import { SubmissionError } from 'redux-form';
-
 import * as actionTypes from 'actions/types';
 
-const NOTIFICATIONS_DURATION = 5000;
+const INITIATED = 1, SUCCESSED = 2, FAILED = 3;
 
 function backendApi(type, url, props = {}, token = '') {
   return backend.request({
@@ -63,38 +61,55 @@ function* signOut(action) {
 
 function* fetchUser() {
   try {
+    yield put({ type: actionTypes.INITIATE_REQUEST, payload: { userIsLoaded: INITIATED, requestError: {} } });
     const user = yield call(backendApi, 'get', '/auth/user', {}, localStorage.getItem('token'));
-
+    yield put({ type: actionTypes.REQUEST_SUCCESS, payload: { userIsLoaded: SUCCESSED } });
     yield put({ type: actionTypes.CHANGE_USER, payload: user.data });
   } catch (e) {
-    if (e.response.status !== 401) {
-      ToastsStore.error(e.response.data, NOTIFICATIONS_DURATION);
-    }
+    yield put({
+      type: actionTypes.REQUEST_ERROR, payload: {
+        userIsLoaded: FAILED,
+        requestError: { status: e.response.status, statusText: e.response.statusText, data: e.response.data, tip: 'userIsNotLoaded' }
+      }
+    });
   }
 }
 
 function* fetchRooms() {
   try {
+    yield put({ type: actionTypes.INITIATE_REQUEST, payload: { roomsAreLoaded: INITIATED, requestError: {} } });
     const response = yield call(backendApi, 'get', '/rooms', {}, localStorage.getItem('token'));
-
-    yield put({ type: actionTypes.FETCH_ROOMS, payload: response.data })
+    yield put({ type: actionTypes.REQUEST_SUCCESS, payload: { roomsAreLoaded: SUCCESSED, requestError: {} } });
+    yield put({ type: actionTypes.FETCH_ROOMS, payload: response.data });
   } catch (e) {
-    ToastsStore.error(e.response.data, NOTIFICATIONS_DURATION);
+    yield put({
+      type: actionTypes.REQUEST_ERROR, payload: {
+        roomsAreLoaded: FAILED,
+        requestError: { status: e.response.status, statusText: e.response.statusText, data: e.response.data, tip: 'roomsAreNotLoaded' }
+      }
+    });
   }
 }
 
 function* fetchRoom(action) {
   try {
+    yield put({ type: actionTypes.INITIATE_REQUEST, payload: { roomIsLoaded: INITIATED, requestError: {} } });
     const response = yield call(backendApi, 'get', `/rooms/${action.payload}`, {}, localStorage.getItem('token'));
-
-    yield put({ type: actionTypes.FETCH_ROOM, payload: response.data })
+    yield put({ type: actionTypes.REQUEST_SUCCESS, payload: { roomIsLoaded: SUCCESSED, requestError: {} } });
+    yield put({ type: actionTypes.FETCH_ROOM, payload: response.data });
   } catch (e) {
-    ToastsStore.error(e.response.data, NOTIFICATIONS_DURATION);
+    yield put({
+      type: actionTypes.REQUEST_ERROR, payload: {
+        roomIsLoaded: FAILED,
+        requestError: { status: e.response.status, statusText: e.response.statusText, data: e.response.data, tip: 'roomIsNotFetched' }
+      }
+    });
   }
 }
 
 function* createRoom(action) {
   try {
+    yield put({ type: actionTypes.INITIATE_REQUEST, payload: { roomIsLoaded: INITIATED, requestError: {} } });
     const response = yield call(backendApi, 'post', '/rooms/new', action.payload.formValues, localStorage.getItem('token'));
     yield put({ type: actionTypes.CREATE_ROOM, payload: response.data });
     action.payload.resolve(response.data._id);
@@ -106,25 +121,39 @@ function* createRoom(action) {
 
 function* deleteRoom(action) {
   try {
+    yield put({ type: actionTypes.INITIATE_REQUEST, payload: { roomIsDeleted: INITIATED, requestError: {} } });
     const response = yield call(backendApi, 'delete', `/rooms/${action.payload.id}`, {}, localStorage.getItem('token'));
+    yield put({ type: actionTypes.REQUEST_SUCCESS, payload: { roomIsDeleted: SUCCESSED, requestError: {} } });
     yield put({ type: actionTypes.DELETE_ROOM, payload: response.data });
     action.payload.resolve();
     history.push('/rooms');
   } catch (e) {
-    ToastsStore.error(e.response.data, NOTIFICATIONS_DURATION);
+    yield put({
+      type: actionTypes.REQUEST_ERROR, payload: {
+        roomIsDeleted: FAILED,
+        requestError: { status: e.response.status, statusText: e.response.statusText, data: e.response.data, tip: 'roomIsNotDeleted' }
+      }
+    });
   }
 }
 
 function* fetchMessages(action) {
   try {
+    yield put({ type: actionTypes.INITIATE_REQUEST, payload: { messagesAreFetched: INITIATED, requestError: {} } });
     const response = yield call(backendApi, 'post', `/rooms/messages`, action.payload.formValues, localStorage.getItem('token'));
+    yield put({ type: actionTypes.REQUEST_SUCCESS, payload: { messagesAreFetched: SUCCESSED, requestError: {} } });
     yield put({ type: actionTypes.FETCH_MESSAGES, payload: response.data });
-    action.payload.resolve(response.data);
+    if (action.payload.resolve) { action.payload.resolve(response.data) };
   } catch (e) {
-    if (e.response.data && (e.response.status !== 401)) {
+    if (action.payload.reject) {
       action.payload.reject(new SubmissionError({ _error: e.response.data.error }));
     } else {
-      ToastsStore.error(`${e.response.status}:${e.response.statusText}`, NOTIFICATIONS_DURATION);
+      yield put({
+        type: actionTypes.REQUEST_ERROR, payload: {
+          messagesAreFetched: FAILED,
+          requestError: { status: e.response.status, statusText: e.response.statusText, data: e.response.data, tip: 'messagesAreNotFetched' }
+        }
+      });
     }
   }
 }
@@ -139,10 +168,17 @@ function* resetMessages() {
 
 function* fetchUsersFromRoom(action) {
   try {
+    yield put({ type: actionTypes.INITIATE_REQUEST, payload: { usersAreFetched: INITIATED, requestError: {} } });
     const response = yield call(backendApi, 'get', `/rooms/${action.payload}/users`, {}, localStorage.getItem('token'));
+    yield put({ type: actionTypes.REQUEST_SUCCESS, payload: { usersAreFetched: SUCCESSED } });
     yield put({ type: actionTypes.FETCH_USERS, payload: response.data });
   } catch (e) {
-    ToastsStore.error(`${e.response.status}:${e.response.statusText}`, NOTIFICATIONS_DURATION);
+    yield put({
+      type: actionTypes.REQUEST_ERROR, payload: {
+        usersAreFetched: FAILED,
+        requestError: { status: e.response.status, statusText: e.response.statusText, data: e.response.data, tip: 'usersAreNotFetched' }
+      }
+    });
   }
 }
 
@@ -169,7 +205,7 @@ function* checkAuth(action) {
   }
 }
 
-function* mySaga() {
+export default function* rootSaga() {
   yield takeLatest(actionTypes.SIGN_UP_REQUEST, signUp);
   yield takeLatest(actionTypes.SIGN_IN_REQUEST, signIn);
   yield takeLatest(actionTypes.SIGN_IN_GOOGLE_REQUEST, signInGoogle);
@@ -187,5 +223,3 @@ function* mySaga() {
   yield takeLatest(actionTypes.EDIT_USER_REQUEST, editUser);
   yield takeLatest(actionTypes.CHECK_AUTH_REQUEST, checkAuth);
 }
-
-export default mySaga;
